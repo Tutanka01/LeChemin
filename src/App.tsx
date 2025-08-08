@@ -104,6 +104,7 @@ export default function App() {
             glowRef={glowRef}
             handleMouseMove={handleMouseMove}
             accent={accent}
+            onNavigateHome={navigateToHome}
           />
         )}
       </motion.div>
