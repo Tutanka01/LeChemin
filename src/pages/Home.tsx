@@ -275,7 +275,7 @@ export default function Home({ onNavigateToParcours, glowRef, handleMouseMove, a
             <div className="h-6 w-6 rounded-md" style={{ background: "linear-gradient(135deg, var(--accent), #1E1E1E)" }} />
             <span className="text-sm font-semibold">LeChemin.tech</span>
           </div>
-          <p className="text-center text-xs opacity-70 md:text-left">© 2024 LeChemin.tech — Une initiative pour rendre la connaissance accessible.</p>
+          <p className="text-center text-xs opacity-70 md:text-left">© 2025 LeChemin.tech — Une initiative pour rendre la connaissance accessible.</p>
           <div className="flex items-center gap-3">
             <a href="https://www.linkedin.com/" target="_blank" rel="noreferrer" className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 transition hover:bg-white/10" aria-label="LinkedIn" title="LinkedIn">
               <Linkedin className="h-4 w-4" />

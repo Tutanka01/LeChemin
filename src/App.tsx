@@ -4,8 +4,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import {
-  Moon,
-  Sun,
   ArrowLeft,
   Menu,
   X
@@ -14,16 +12,16 @@ import Home from "./pages/Home";
 import Parcours from "./pages/Parcours";
 
 export default function App() {
-  // Theme (default: dark)
-  const [isDark, setIsDark] = useState(true);
+  // Theme (force dark)
+  const [isDark] = useState(true);
   const [currentPage, setCurrentPage] = useState<"home" | "parcours">("home");
   const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
     const root = document.documentElement;
-    if (isDark) root.classList.add("dark");
-    else root.classList.remove("dark");
-  }, [isDark]);
+    root.classList.add("dark"); // toujours sombre
+    return () => root.classList.add("dark");
+  }, []);
 
   useEffect(() => {
     document.body.style.overflow = mobileOpen ? 'hidden' : '';
@@ -79,15 +77,8 @@ export default function App() {
               )}
             </div>
 
-            {/* Theme toggle */}
-            <button
-              onClick={() => setIsDark((v) => !v)}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/70 text-zinc-800 transition hover:bg-white dark:bg-zinc-900/70 dark:text-zinc-100 dark:hover:bg-zinc-900"
-              aria-label="Basculer le thème"
-              title="Basculer le thème"
-            >
-              {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-            </button>
+            {/* Theme toggle removed */}
+            {/* (Supprimé: plus de mode clair) */}
 
             {/* Hamburger bouton (mobile) */}
             <button
@@ -111,9 +102,11 @@ export default function App() {
             open: { opacity: 1, pointerEvents: 'auto' },
             closed: { opacity: 0, pointerEvents: 'none' }
           }}
-          className="md:hidden fixed inset-0 z-40 flex flex-col bg-gradient-to-br from-white/90 to-white/70 backdrop-blur-xl dark:from-zinc-950/90 dark:to-zinc-900/80"
+          className="md:hidden fixed inset-0 z-[80] flex flex-col h-[100dvh] bg-gradient-to-br from-white/95 to-white/80 backdrop-blur-2xl dark:from-zinc-950/95 dark:to-zinc-900/85"
+          style={{ paddingTop: 'max(env(safe-area-inset-top), 0.75rem)' }}
         >
-          <div className="flex items-center justify-between px-5 pt-4 pb-2">
+          {/* Barre supérieure dans l'overlay (au-dessus du header) */}
+          <div className="flex items-center justify-between px-5 pb-3">
             <button onClick={navigateToHome} className="flex items-center gap-2" aria-label="Accueil">
               <div className="h-8 w-8 rounded-lg" style={{ background: `linear-gradient(135deg, var(--accent), #1E1E1E)` }} />
               <span className="font-semibold text-sm">LeChemin.tech</span>
@@ -126,12 +119,13 @@ export default function App() {
               <X className="h-6 w-6" />
             </button>
           </div>
-          <div className="mt-4 flex-1 overflow-y-auto px-6 pb-10">
-            <div className="flex flex-col gap-4">
+          {/* Contenu scrollable */}
+          <div className="flex-1 overflow-y-auto px-6 pb-10">
+            <div className="mx-auto w-full max-w-sm flex flex-col gap-5">
               {currentPage === 'home' && (
                 <button
                   onClick={navigateToParcours}
-                  className="group w-full rounded-2xl bg-[var(--accent)] px-5 py-4 text-base font-semibold text-white shadow-sm transition hover:shadow-md"
+                  className="group w-full rounded-2xl bg-[var(--accent)] px-6 py-4 text-base font-semibold text-white shadow-md transition hover:shadow-lg"
                 >
                   Parcours DevOps
                 </button>
@@ -139,7 +133,7 @@ export default function App() {
               {currentPage === 'parcours' && (
                 <button
                   onClick={navigateToHome}
-                  className="group w-full rounded-2xl bg-white/70 px-5 py-4 text-base font-medium shadow-sm transition hover:bg-white dark:bg-zinc-800/70 dark:hover:bg-zinc-800"
+                  className="group w-full rounded-2xl bg-white/70 px-6 py-4 text-base font-medium shadow-sm transition hover:bg-white dark:bg-zinc-800/70 dark:hover:bg-zinc-800"
                 >
                   ← Retour à l'accueil
                 </button>
@@ -149,24 +143,19 @@ export default function App() {
                   <a
                     href="#mission"
                     onClick={() => setMobileOpen(false)}
-                    className="w-full rounded-2xl bg-white/70 px-5 py-4 text-base font-medium shadow-sm transition hover:bg-white dark:bg-zinc-800/70 dark:hover:bg-zinc-800"
+                    className="block w-full rounded-2xl bg-white/70 px-6 py-4 text-base font-medium shadow-sm transition hover:bg-white dark:bg-zinc-800/70 dark:hover:bg-zinc-800"
                   >Mission</a>
                   <a
                     href="#contact"
                     onClick={() => setMobileOpen(false)}
-                    className="w-full rounded-2xl bg-white/70 px-5 py-4 text-base font-medium shadow-sm transition hover:bg-white dark:bg-zinc-800/70 dark:hover:bg-zinc-800"
+                    className="block w-full rounded-2xl bg-white/70 px-6 py-4 text-base font-medium shadow-sm transition hover:bg-white dark:bg-zinc-800/70 dark:hover:bg-zinc-800"
                   >Contact</a>
                 </>
               )}
-              <div className="pt-6 flex gap-3">
-                <button
-                  onClick={() => setIsDark(v => !v)}
-                  className="flex-1 rounded-2xl bg-zinc-900 text-white py-4 font-medium dark:bg-white dark:text-zinc-900 transition"
-                >
-                  {isDark ? 'Mode clair' : 'Mode sombre'}
-                </button>
+              <div className="pt-4 flex gap-3">
+                {/* Bouton thème supprimé */}
               </div>
-              <div className="pt-8 text-[11px] uppercase tracking-wide opacity-40 text-center">Menu</div>
+              <div className="pt-10 text-[10px] uppercase tracking-[0.15em] text-center opacity-40">MENU</div>
             </div>
           </div>
         </motion.div>
@@ -183,7 +172,7 @@ export default function App() {
         {currentPage === "home" ? (
           <Home
             isDark={isDark}
-            setIsDark={setIsDark}
+            setIsDark={() => { /* noop: mode clair désactivé */ }}
             onNavigateToParcours={navigateToParcours}
             glowRef={glowRef}
             handleMouseMove={handleMouseMove}
@@ -192,7 +181,7 @@ export default function App() {
         ) : (
           <Parcours
             isDark={isDark}
-            setIsDark={setIsDark}
+            setIsDark={() => { /* noop */ }}
             glowRef={glowRef}
             handleMouseMove={handleMouseMove}
             accent={accent}
