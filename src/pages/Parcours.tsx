@@ -1,8 +1,9 @@
-// LeChemin.tech — Page Parcours
+// LeChemin.tech — Page Parcours (MPA)
 // Parcours DevOps simplifié et interactif
 
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { createPortal } from 'react-dom';
 import {
   ServerCog,
   ChevronRight,
@@ -18,9 +19,8 @@ import {
   Link as LinkIcon,
 } from "lucide-react";
 
+// Props réduites pour mode MPA (thème géré dans l'entrypoint /src/parcours.tsx)
 interface ParcoursProps {
-  isDark: boolean;
-  setIsDark: (dark: boolean) => void;
   glowRef: React.RefObject<HTMLDivElement>;
   handleMouseMove: (e: React.MouseEvent) => void;
   accent: string;
@@ -172,366 +172,206 @@ export default function Parcours({ glowRef, handleMouseMove, accent, onNavigateH
   const [selectedStep, setSelectedStep] = useState<DevOpsStep | null>(null);
   const [copied, setCopied] = useState(false);
 
-  // Deep-link: open modal if URL hash matches an id
+  // Deep-link modal via hash (ouverture initiale)
   useEffect(() => {
-    const id = window.location.hash.replace("#", "");
+    const id = window.location.hash.replace('#', '');
     if (!id) return;
-    const step = devOpsPath.find((st) => st.id === id);
+    const step = devOpsPath.find(st => st.id === id);
     if (step) setSelectedStep(step);
   }, []);
 
-  // When modal opens/closes, sync hash
+  // Synchronisation hash uniquement si changement réel
   useEffect(() => {
     if (selectedStep) {
-      history.replaceState(null, "", `#${selectedStep.id}`);
-    } else {
-      history.replaceState(null, "", window.location.pathname);
+      const targetHash = `#${selectedStep.id}`;
+      if (window.location.hash !== targetHash) history.replaceState(null, '', targetHash);
+    } else if (window.location.hash) {
+      history.replaceState(null, '', window.location.pathname);
+    }
+  }, [selectedStep]);
+
+  // Blocage du scroll arrière-plan quand modal ouverte
+  useEffect(() => {
+    if (selectedStep) {
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => { document.body.style.overflow = prev; };
     }
   }, [selectedStep]);
 
   const openFirstResource = (step: DevOpsStep) => {
     const first = step.resources?.[0];
-    if (first?.url) window.open(first.url, "_blank", "noopener,noreferrer");
+    if (first?.url) window.open(first.url, '_blank', 'noopener,noreferrer');
   };
 
-  const StepCard = ({ step, index, isConnected }: { step: DevOpsStep; index: number; isConnected: boolean }) => {
-    return (
-      <motion.div 
-        id={step.id} 
-        initial={{ opacity: 0, y: 30 }} 
-        whileInView={{ opacity: 1, y: 0 }} 
-        viewport={{ once: true, amount: 0.3 }} 
-        transition={{ duration: 0.5, delay: index * 0.1 }} 
-        className="relative"
-      >
-        {/* Connecting line */}
-        {isConnected && (
-          <div className="absolute left-1/2 top-0 h-12 w-0.5 -translate-x-1/2 -translate-y-12 bg-gradient-to-b from-transparent via-zinc-300 to-transparent dark:via-zinc-600 md:h-16 md:-translate-y-16" />
-        )}
+  const openStep = (step: DevOpsStep) => { if (selectedStep?.id !== step.id) setSelectedStep(step); };
 
+  // Step card mémoïsée pour éviter re-rendus lors de l'ouverture du modal
+  const StepCard = React.memo(function StepCard({ step, index, isConnected }: { step: DevOpsStep; index: number; isConnected: boolean }) {
+    return (
+      <motion.div
+        id={step.id}
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: 0.5, delay: index * 0.1 }}
+        className="relative"
+        style={{ willChange: 'transform, opacity' }}
+      >
+        {isConnected && (
+          <div className="absolute left-1/2 top-0 h-12 w-0.5 -translate-x-1/2 -translate-y-12 bg-gradient-to-b from-transparent via-zinc-700 to-transparent md:h-16 md:-translate-y-16" />
+        )}
         <motion.div
           whileHover={{ scale: 1.02, y: -5 }}
-          onClick={() => setSelectedStep(step)}
+          onClick={() => openStep(step)}
           tabIndex={0}
           role="button"
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              e.preventDefault();
-              setSelectedStep(step);
-            }
-          }}
-          className="group relative cursor-pointer rounded-2xl border border-white/20 bg-white/70 p-5 backdrop-blur-sm transition-all duration-300 hover:shadow-xl dark:bg-zinc-900/60 sm:rounded-3xl sm:p-8"
-          style={{ 
-            boxShadow: `0 4px 18px ${step.color}12, inset 0 0 0 1px ${step.color}20`
-          }}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openStep(step); } }}
+          className="group relative cursor-pointer rounded-2xl border border-white/10 bg-zinc-900/60 p-5 backdrop-blur-sm transition-all duration-300 hover:shadow-xl sm:rounded-3xl sm:p-8"
+          style={{ boxShadow: `0 4px 18px ${step.color}10, inset 0 0 0 1px ${step.color}25`, willChange: 'transform' }}
         >
-          {/* Icon */}
           <div
             className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-xl shadow-md sm:h-16 sm:w-16 sm:rounded-2xl"
-            style={{ 
-              backgroundColor: `${step.color}18`,
-              boxShadow: `0 4px 14px ${step.color}25`
-            }}
+            style={{ backgroundColor: `${step.color}22`, boxShadow: `0 4px 14px ${step.color}33` }}
           >
-            {React.createElement(step.icon, {
-              className: "h-7 w-7 sm:h-8 sm:w-8",
-              style: { color: step.color }
-            })}
+            {React.createElement(step.icon, { className: 'h-7 w-7 sm:h-8 sm:w-8', style: { color: step.color } })}
           </div>
-
-          {/* Content */}
           <div className="space-y-3 sm:space-y-4">
             <div>
               <h3 className="text-lg font-bold tracking-tight sm:text-xl">{step.title}</h3>
-              <p className="mt-2 text-[13px] leading-relaxed opacity-80 sm:text-sm">{step.description}</p>
+              <p className="mt-2 text-[13px] leading-relaxed text-zinc-300 sm:text-sm">{step.description}</p>
             </div>
-
             <div className="flex flex-wrap gap-2">
-              <div className="flex items-center gap-1 rounded-full bg-white/30 px-3 py-1 text-[11px] sm:text-xs">
-                <Clock className="h-3 w-3" />
-                {step.duration}
-              </div>
-              <div
-                className={`rounded-full px-3 py-1 text-[11px] sm:text-xs ${
-                  step.difficulty === "Débutant"
-                    ? "bg-green-500/20 text-green-600 dark:text-green-400"
-                    : step.difficulty === "Intermédiaire"
-                    ? "bg-yellow-500/20 text-yellow-600 dark:text-yellow-400"
-                    : "bg-red-500/20 text-red-600 dark:text-red-400"
-                }`}
-              >
-                {step.difficulty}
-              </div>
+              <div className="flex items-center gap-1 rounded-full bg-white/5 px-3 py-1 text-[11px] text-zinc-300 ring-1 ring-white/10 sm:text-xs"><Clock className="h-3 w-3" />{step.duration}</div>
+              <div className={`rounded-full px-3 py-1 text-[11px] sm:text-xs ${
+                step.difficulty === 'Débutant' ? 'bg-green-500/15 text-green-400 ring-1 ring-green-500/30' :
+                step.difficulty === 'Intermédiaire' ? 'bg-yellow-500/15 text-yellow-400 ring-1 ring-yellow-500/30' :
+                'bg-red-500/15 text-red-400 ring-1 ring-red-500/30'}`}>{step.difficulty}</div>
             </div>
-
             <div className="flex flex-wrap gap-1">
-              {step.skills.slice(0, 3).map((skill) => (
-                <span key={skill} className="rounded-md bg-zinc-200/60 px-2 py-1 text-[11px] sm:text-xs dark:bg-zinc-700/50">
-                  {skill}
-                </span>
+              {step.skills.slice(0, 3).map(skill => (
+                <span key={skill} className="rounded-md bg-white/5 px-2 py-1 text-[11px] text-zinc-300 ring-1 ring-white/10 sm:text-xs">{skill}</span>
               ))}
               {step.skills.length > 3 && (
-                <span className="rounded-md bg-zinc-200/60 px-2 py-1 text-[11px] sm:text-xs dark:bg-zinc-700/50">+{step.skills.length - 3}</span>
+                <span className="rounded-md bg-white/5 px-2 py-1 text-[11px] text-zinc-300 ring-1 ring-white/10 sm:text-xs">+{step.skills.length - 3}</span>
               )}
             </div>
-
-            <div className="flex items-center gap-2 text-xs font-medium opacity-80 sm:text-sm">
-              Explorer ce module
-              <ChevronRight className="h-4 w-4 transition group-hover:translate-x-1" />
-            </div>
+            <div className="flex items-center gap-2 text-xs font-medium text-zinc-400 sm:text-sm">Explorer ce module <ChevronRight className="h-4 w-4 transition group-hover:translate-x-1" /></div>
           </div>
-
-          {/* Glow effect on hover (hidden mobile) */}
-          <div 
-            aria-hidden 
-            className="pointer-events-none absolute -bottom-16 left-1/2 hidden h-36 w-36 -translate-x-1/2 rounded-full blur-2xl opacity-0 transition group-hover:opacity-40 sm:block" 
-            style={{ background: `radial-gradient(closest-side, ${step.color}, transparent)` }} 
-          />
+          <div aria-hidden className="pointer-events-none absolute -bottom-16 left-1/2 hidden h-36 w-36 -translate-x-1/2 rounded-full blur-2xl opacity-0 transition group-hover:opacity-40 sm:block" style={{ background: `radial-gradient(closest-side, ${step.color}, transparent)` }} />
         </motion.div>
       </motion.div>
     );
-  };
+  });
+
+  StepCard.displayName = 'StepCard';
+
+  // Modal via portal pour éviter reflow de la grille
+  const modal = selectedStep ? createPortal(
+    <AnimatePresence>
+      <motion.div key="overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onMouseDown={() => setSelectedStep(null)}>
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.9, opacity: 0 }}
+          transition={{ type: 'spring', stiffness: 320, damping: 30 }}
+          className="mx-4 max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-3xl border border-white/10 bg-zinc-900/95 p-8 shadow-2xl ring-1 ring-white/10"
+          onMouseDown={e => e.stopPropagation()}
+        >
+          <div className="mb-6 flex items-start justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl" style={{ backgroundColor: `${selectedStep.color}20` }}>
+                {React.createElement(selectedStep.icon, { className: 'h-6 w-6', style: { color: selectedStep.color } })}
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold tracking-tight text-white">{selectedStep.title}</h2>
+                <p className="text-sm text-zinc-400">{selectedStep.duration} • {selectedStep.difficulty}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={async () => { try { await navigator.clipboard.writeText(window.location.href); setCopied(true); setTimeout(() => setCopied(false), 1400); } catch {} }}
+                className="rounded-xl px-3 py-2 text-sm font-medium text-zinc-200 transition hover:bg-white/5 focus:outline-none focus:ring focus:ring-white/10"
+              >
+                <span className="flex items-center gap-1.5"><LinkIcon className="h-4 w-4" /> Copier</span>
+              </button>
+              <button onClick={() => setSelectedStep(null)} className="rounded-xl p-2 text-zinc-300 transition hover:bg-white/5 focus:outline-none focus:ring focus:ring-white/10" aria-label="Fermer"><ArrowLeft className="h-5 w-5" /></button>
+            </div>
+          </div>
+          {copied && <div className="mb-4 rounded-lg bg-green-500/15 px-3 py-2 text-sm text-green-300 ring-1 ring-green-500/30">Lien copié</div>}
+          <div className="space-y-6 text-zinc-300">
+            <p className="leading-relaxed">{selectedStep.description}</p>
+            <div>
+              <h3 className="mb-3 font-semibold text-white">Compétences</h3>
+              <div className="flex flex-wrap gap-2">{selectedStep.skills.map(skill => <span key={skill} className="rounded-md bg-white/5 px-3 py-1 text-sm text-zinc-200 ring-1 ring-white/10">{skill}</span>)}</div>
+            </div>
+            <div>
+              <h3 className="mb-3 font-semibold text-white">Ressources</h3>
+              <div className="space-y-2">{selectedStep.resources.map((r,i)=>(
+                <a key={i} href={r.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 rounded-lg bg-white/5 p-3 text-sm text-zinc-200 transition hover:bg-white/10 focus:outline-none focus:ring focus:ring-white/10">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/25"><BookOpen className="h-4 w-4 text-blue-400" /></div>
+                  <div className="flex-1"><div className="font-medium text-white/90">{r.title}</div><div className="text-[11px] uppercase tracking-wide text-blue-300/70">{r.type}</div></div>
+                  <ChevronRight className="h-4 w-4 text-zinc-500" />
+                </a>
+              ))}</div>
+            </div>
+            <div className="flex flex-col gap-3 pt-4 sm:flex-row">
+              <button onClick={() => openFirstResource(selectedStep)} className="flex-1 rounded-xl bg-gradient-to-b from-blue-500 to-blue-600 px-6 py-3 text-sm font-semibold text-white shadow hover:brightness-110 focus:outline-none focus:ring focus:ring-blue-400/40">Commencer</button>
+              {(() => { const idx = devOpsPath.findIndex(s => s.id === selectedStep.id); const next = devOpsPath[idx+1]; return next ? <button onClick={() => openStep(next)} className="rounded-xl border border-white/10 bg-white/5 px-6 py-3 text-sm font-semibold text-zinc-200 backdrop-blur transition hover:bg-white/10 focus:outline-none focus:ring focus:ring-white/10">Suivant</button> : null; })()}
+            </div>
+          </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>, document.body) : null;
 
   return (
-    <div
-      style={{ ["--accent" as string]: accent }}
-      className="relative min-h-screen text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-100"
-      onMouseMove={handleMouseMove}
-    >
-      {/* Background elements */}
+    <div style={{ ["--accent" as string]: accent }} className="relative min-h-screen text-zinc-100 bg-zinc-950" onMouseMove={handleMouseMove}>
+      {/* Décor */}
       <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div
-          className="absolute -top-32 left-1/2 h-[60rem] w-[60rem] -translate-x-1/2 rounded-full blur-3xl"
-          style={{ background: "radial-gradient(closest-side, var(--accent) 0%, transparent 60%)", opacity: 0.08 }}
-        />
-        <svg className="absolute inset-0 h-full w-full opacity-[0.03] dark:opacity-[0.05]" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-          <defs>
-            <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-              <path d="M40 0H0V40" fill="none" stroke="currentColor" strokeWidth="0.5" />
-            </pattern>
-          </defs>
+        <div className="absolute -top-32 left-1/2 h-[60rem] w-[60rem] -translate-x-1/2 rounded-full blur-3xl" style={{ background: "radial-gradient(closest-side, var(--accent) 0%, transparent 60%)", opacity: 0.08 }} />
+        <svg className="absolute inset-0 h-full w-full opacity-[0.05]" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+          <defs><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="currentColor" strokeWidth="0.5" /></pattern></defs>
           <rect width="100%" height="100%" fill="url(#grid)" />
         </svg>
       </div>
-
-      {/* Mouse glow */}
-      <div
-        ref={glowRef}
-        data-testid="global-glow"
-        aria-hidden
-        className="pointer-events-none fixed z-0 h-[300px] w-[300px] rounded-full opacity-30 blur-2xl"
-        style={{
-          left: 0,
-          top: 0,
-          background: "radial-gradient(closest-side, var(--accent), transparent 70%)",
-          transform: "translate3d(-150px, -150px, 0)",
-          willChange: "transform",
-          mixBlendMode: "screen",
-        }}
-      />
-
+      {/* Glow */}
+      <div ref={glowRef} data-testid="global-glow" aria-hidden className="pointer-events-none fixed z-0 h-[300px] w-[300px] rounded-full opacity-30 blur-2xl" style={{ left: 0, top: 0, background: "radial-gradient(closest-side, var(--accent), transparent 70%)", transform: "translate3d(-150px, -150px, 0)", willChange: 'transform', mixBlendMode: 'screen' }} />
       <div className="relative z-10">
-        {/* Hero Section */}
+        {/* Hero */}
         <section className="relative py-20">
           <div className="mx-auto max-w-7xl px-4 md:px-6">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="text-center">
-              <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-blue-500/10 px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-400">
-                <Star className="h-4 w-4" />
-                Parcours DevOps
-              </div>
-
-              <h1 className="mb-6 text-4xl font-black tracking-tight md:text-6xl">
-                Votre Chemin vers le
-                <span className="bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent"> DevOps</span>
-              </h1>
-
-              <p className="mx-auto mb-8 max-w-2xl text-lg leading-relaxed opacity-80">
-                Un parcours structuré et visuel pour maîtriser DevOps étape par étape.
-                Chaque module vous prépare au suivant avec des ressources sélectionnées.
-              </p>
-
-              {/* Bloc de transparence authentique (remplace les métriques abstraites) */}
-              <div className="mx-auto mb-2 max-w-3xl text-sm italic opacity-70">
-                Pas de chiffres marketing artificiels — juste un chemin clair, vivant et améliorable.
-              </div>
+              <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-blue-500/10 px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-400"><Star className="h-4 w-4" />Parcours DevOps</div>
+              <h1 className="mb-6 text-4xl font-black tracking-tight md:text-6xl">Votre Chemin vers le <span className="bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">DevOps</span></h1>
+              <p className="mx-auto mb-8 max-w-2xl text-lg leading-relaxed opacity-80">Un parcours structuré et visuel pour maîtriser DevOps étape par étape. Chaque module prépare le suivant.</p>
+              <div className="mx-auto mb-2 max-w-3xl text-sm italic opacity-70">Pas de chiffres marketing artificiels — juste un chemin clair.</div>
               <div className="flex flex-col items-center gap-3 sm:flex-row sm:flex-wrap sm:justify-center">
-                <div className="rounded-full bg-white/10 px-5 py-3 text-sm backdrop-blur dark:bg-white/5">
-                  Construit avec passion et maintenu en continu
-                </div>
-                <div className="rounded-full bg-white/10 px-5 py-3 text-sm backdrop-blur dark:bg-white/5">
-                  Basé sur +5 ans d'expérience combinée (Cloud, Dev, Ops)
-                </div>
-                <div className="rounded-full bg-white/10 px-5 py-3 text-sm backdrop-blur dark:bg-white/5">
-                  Ressources ouvertes, priorisées & francophones quand possible
-                </div>
+                <div className="rounded-full bg-white/10 px-5 py-3 text-sm backdrop-blur dark:bg-white/5">Construit avec passion</div>
+                <div className="rounded-full bg-white/10 px-5 py-3 text-sm backdrop-blur dark:bg-white/5">Expérience terrain</div>
+                <div className="rounded-full bg-white/10 px-5 py-3 text-sm backdrop-blur dark:bg-white/5">Ressources ouvertes</div>
               </div>
             </motion.div>
           </div>
         </section>
-
-        {/* Learning Path */}
+        {/* Liste */}
         <section className="relative py-12">
           <div className="mx-auto max-w-4xl px-4 md:px-6">
             <div className="space-y-16">
-              {devOpsPath.map((step, index) => (
-                <StepCard key={step.id} step={step} index={index} isConnected={index > 0} />
-              ))}
+              {devOpsPath.map((step, i) => <StepCard key={step.id} step={step} index={i} isConnected={i > 0} />)}
             </div>
           </div>
         </section>
-
-        {/* Step Detail Modal */}
-        <AnimatePresence>
-          {selectedStep && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
-              onClick={() => setSelectedStep(null)}
-            >
-              <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.9, opacity: 0 }}
-                className="mx-4 max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-3xl border border-white/20 bg-white/95 p-8 backdrop-blur dark:bg-zinc-900/95"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div className="mb-6 flex items-start justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-xl" style={{ backgroundColor: `${selectedStep.color}20` }}>
-                      {React.createElement(selectedStep.icon, {
-                        className: "h-6 w-6",
-                        style: { color: selectedStep.color }
-                      })}
-                    </div>
-                    <div>
-                      <h2 className="text-2xl font-bold">{selectedStep.title}</h2>
-                      <p className="text-sm opacity-70">
-                        {selectedStep.duration} • {selectedStep.difficulty}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={async () => {
-                        try {
-                          await navigator.clipboard.writeText(window.location.href);
-                          setCopied(true);
-                          setTimeout(() => setCopied(false), 1500);
-                        } catch (_) {}
-                      }}
-                      className="rounded-xl px-3 py-2 text-sm font-medium transition hover:bg-zinc-100 dark:hover:bg-zinc-800"
-                      title="Copier le lien de l'étape"
-                    >
-                      <div className="flex items-center gap-1.5"><LinkIcon className="h-4 w-4" /> Copier le lien</div>
-                    </button>
-                    <button onClick={() => setSelectedStep(null)} className="rounded-xl p-2 transition hover:bg-zinc-100 dark:hover:bg-zinc-800" aria-label="Fermer">
-                      <ArrowLeft className="h-5 w-5" />
-                    </button>
-                  </div>
-                </div>
-
-                {copied && (
-                  <div className="mb-4 rounded-lg bg-green-500/10 p-3 text-sm text-green-700 dark:text-green-400">
-                    Lien copié !
-                  </div>
-                )}
-
-                <div className="space-y-6">
-                  <p className="leading-relaxed opacity-90">{selectedStep.description}</p>
-
-                  <div>
-                    <h3 className="mb-3 font-semibold">Compétences à acquérir</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedStep.skills.map((skill) => (
-                        <span key={skill} className="rounded-md bg-zinc-100 px-3 py-1 text-sm dark:bg-zinc-800">
-                          {skill}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div>
-                    <h3 className="mb-3 font-semibold">Ressources recommandées</h3>
-                    <div className="space-y-2">
-                      {selectedStep.resources.map((resource, index) => (
-                        <a
-                          key={index}
-                          href={resource.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-3 rounded-lg bg-zinc-50 p-3 transition hover:bg-zinc-100 dark:bg-zinc-800/50 dark:hover:bg-zinc-800"
-                        >
-                          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/20">
-                            <BookOpen className="h-4 w-4 text-blue-500" />
-                          </div>
-                          <div className="flex-1">
-                            <div className="font-medium">{resource.title}</div>
-                            <div className="text-xs opacity-70">{resource.type}</div>
-                          </div>
-                          <ChevronRight className="h-4 w-4 opacity-50" />
-                        </a>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="flex gap-3 pt-4">
-                    <button
-                      onClick={() => openFirstResource(selectedStep)}
-                      className="flex-1 rounded-xl px-6 py-3 font-semibold text-white transition hover:bg-blue-600"
-                      style={{ background: selectedStep.color }}
-                    >
-                      Commencer à apprendre
-                    </button>
-                    {(() => {
-                      const idx = devOpsPath.findIndex((s) => s.id === selectedStep.id);
-                      const next = devOpsPath[idx + 1];
-                      return next ? (
-                        <button
-                          onClick={() => setSelectedStep(next)}
-                          className="rounded-xl border border-white/20 bg-white/10 px-6 py-3 font-semibold backdrop-blur transition hover:bg-white/20"
-                        >
-                          Module suivant
-                        </button>
-                      ) : null;
-                    })()}
-                  </div>
-                </div>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Call to Action */}
+        {/* Modal */}
+        {modal}
+        {/* CTA */}
         <section className="relative py-20">
           <div className="mx-auto max-w-4xl px-4 text-center md:px-6">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="rounded-3xl border border-white/10 bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-pink-500/10 p-12 backdrop-blur"
-            >
-              <h2 className="mb-4 text-3xl font-bold">Prêt à commencer votre transformation ?</h2>
-              <p className="mb-8 opacity-80">
-                Rejoignez des milliers d'apprenants qui construisent leur carrière DevOps avec nos parcours guidés.
-              </p>
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="rounded-3xl border border-white/10 bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-pink-500/10 p-12 backdrop-blur">
+              <h2 className="mb-4 text-3xl font-bold">Prêt à commencer ?</h2>
+              <p className="mb-8 opacity-80">Lancez-vous dès maintenant avec le premier module.</p>
               <div className="flex flex-wrap justify-center gap-4">
-                <button
-                  onClick={() => setSelectedStep(devOpsPath[0])}
-                  className="rounded-xl bg-blue-500 px-8 py-4 font-semibold text-white transition hover:bg-blue-600"
-                >
-                  Commencer le premier module
-                </button>
-                <button
-                  onClick={() => {
-                    if (onNavigateHome) onNavigateHome();
-                    else window.location.href = "/";
-                  }}
-                  className="rounded-xl border border-white/20 bg-white/10 px-8 py-4 font-semibold backdrop-blur transition hover:bg-white/20"
-                >
-                  Voir tous les parcours
-                </button>
+                <button onClick={() => setSelectedStep(devOpsPath[0])} className="rounded-xl bg-blue-500 px-8 py-4 font-semibold text-white transition hover:bg-blue-600">Premier module</button>
+                <button onClick={() => { if (onNavigateHome) onNavigateHome(); else window.location.href = "/"; }} className="rounded-xl border border-white/20 bg-white/10 px-8 py-4 font-semibold backdrop-blur transition hover:bg-white/20">Accueil</button>
               </div>
             </motion.div>
           </div>
