@@ -69,6 +69,7 @@ export default function Home({ onNavigateToParcours, glowRef, handleMouseMove, a
       className="relative min-h-screen text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-100"
       onMouseMove={handleMouseMove}
     >
+      <h1 className="sr-only">Roadmap DevOps & Cloud en Français – LeChemin.tech</h1>
       {/* Subtle static background */}
       <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
         <div
