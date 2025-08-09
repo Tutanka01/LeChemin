@@ -206,7 +206,7 @@ export default function Parcours({ glowRef, handleMouseMove, accent, onNavigateH
       >
         {/* Connecting line */}
         {isConnected && (
-          <div className="absolute left-1/2 top-0 h-16 w-0.5 -translate-x-1/2 -translate-y-16 bg-gradient-to-b from-transparent via-zinc-300 to-transparent dark:via-zinc-600" />
+          <div className="absolute left-1/2 top-0 h-12 w-0.5 -translate-x-1/2 -translate-y-12 bg-gradient-to-b from-transparent via-zinc-300 to-transparent dark:via-zinc-600 md:h-16 md:-translate-y-16" />
         )}
 
         <motion.div
@@ -220,39 +220,39 @@ export default function Parcours({ glowRef, handleMouseMove, accent, onNavigateH
               setSelectedStep(step);
             }
           }}
-          className="group relative cursor-pointer rounded-3xl border border-white/20 bg-white/60 p-8 backdrop-blur transition-all duration-300 hover:shadow-xl dark:bg-zinc-900/60 hover:border-white/40"
+          className="group relative cursor-pointer rounded-2xl border border-white/20 bg-white/70 p-5 backdrop-blur-sm transition-all duration-300 hover:shadow-xl dark:bg-zinc-900/60 sm:rounded-3xl sm:p-8"
           style={{ 
-            boxShadow: `0 10px 40px ${step.color}15, inset 0 0 0 1px ${step.color}20`
+            boxShadow: `0 4px 18px ${step.color}12, inset 0 0 0 1px ${step.color}20`
           }}
         >
           {/* Icon */}
           <div
-            className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-2xl shadow-lg"
+            className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-xl shadow-md sm:h-16 sm:w-16 sm:rounded-2xl"
             style={{ 
-              backgroundColor: `${step.color}20`,
-              boxShadow: `0 6px 20px ${step.color}30`
+              backgroundColor: `${step.color}18`,
+              boxShadow: `0 4px 14px ${step.color}25`
             }}
           >
             {React.createElement(step.icon, {
-              className: "h-8 w-8",
+              className: "h-7 w-7 sm:h-8 sm:w-8",
               style: { color: step.color }
             })}
           </div>
 
           {/* Content */}
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             <div>
-              <h3 className="text-xl font-bold tracking-tight">{step.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed opacity-80">{step.description}</p>
+              <h3 className="text-lg font-bold tracking-tight sm:text-xl">{step.title}</h3>
+              <p className="mt-2 text-[13px] leading-relaxed opacity-80 sm:text-sm">{step.description}</p>
             </div>
 
             <div className="flex flex-wrap gap-2">
-              <div className="flex items-center gap-1 rounded-full bg-white/10 px-3 py-1 text-xs">
+              <div className="flex items-center gap-1 rounded-full bg-white/30 px-3 py-1 text-[11px] sm:text-xs">
                 <Clock className="h-3 w-3" />
                 {step.duration}
               </div>
               <div
-                className={`rounded-full px-3 py-1 text-xs ${
+                className={`rounded-full px-3 py-1 text-[11px] sm:text-xs ${
                   step.difficulty === "Débutant"
                     ? "bg-green-500/20 text-green-600 dark:text-green-400"
                     : step.difficulty === "Intermédiaire"
@@ -266,25 +266,25 @@ export default function Parcours({ glowRef, handleMouseMove, accent, onNavigateH
 
             <div className="flex flex-wrap gap-1">
               {step.skills.slice(0, 3).map((skill) => (
-                <span key={skill} className="rounded-md bg-zinc-200/50 px-2 py-1 text-xs dark:bg-zinc-700/50">
+                <span key={skill} className="rounded-md bg-zinc-200/60 px-2 py-1 text-[11px] sm:text-xs dark:bg-zinc-700/50">
                   {skill}
                 </span>
               ))}
               {step.skills.length > 3 && (
-                <span className="rounded-md bg-zinc-200/50 px-2 py-1 text-xs dark:bg-zinc-700/50">+{step.skills.length - 3}</span>
+                <span className="rounded-md bg-zinc-200/60 px-2 py-1 text-[11px] sm:text-xs dark:bg-zinc-700/50">+{step.skills.length - 3}</span>
               )}
             </div>
 
-            <div className="flex items-center gap-2 text-sm font-medium opacity-80">
+            <div className="flex items-center gap-2 text-xs font-medium opacity-80 sm:text-sm">
               Explorer ce module
               <ChevronRight className="h-4 w-4 transition group-hover:translate-x-1" />
             </div>
           </div>
 
-          {/* Glow effect on hover */}
+          {/* Glow effect on hover (hidden mobile) */}
           <div 
             aria-hidden 
-            className="absolute -bottom-20 left-1/2 h-40 w-40 -translate-x-1/2 rounded-full blur-2xl opacity-0 transition group-hover:opacity-40" 
+            className="pointer-events-none absolute -bottom-16 left-1/2 hidden h-36 w-36 -translate-x-1/2 rounded-full blur-2xl opacity-0 transition group-hover:opacity-40 sm:block" 
             style={{ background: `radial-gradient(closest-side, ${step.color}, transparent)` }} 
           />
         </motion.div>

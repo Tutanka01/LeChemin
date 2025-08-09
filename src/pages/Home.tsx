@@ -107,13 +107,13 @@ export default function Home({ onNavigateToParcours, glowRef, handleMouseMove, a
 
       {/* HERO */}
       <section className="relative pt-20">
-        <div className="mx-auto max-w-7xl px-4 py-16 md:py-24 md:px-6">
+        <div className="mx-auto max-w-7xl px-4 py-14 md:py-24 md:px-6">
           <motion.h1
             data-testid="hero-title"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="text-balance text-4xl font-black leading-tight tracking-tight md:text-6xl"
+            className="text-balance text-3xl font-black leading-[1.05] tracking-tight sm:text-4xl md:text-6xl"
           >
             La boussole moderne pour les métiers tech
           </motion.h1>
@@ -122,7 +122,7 @@ export default function Home({ onNavigateToParcours, glowRef, handleMouseMove, a
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.05, duration: 0.6 }}
-            className="mt-4 max-w-2xl text-pretty text-base leading-relaxed opacity-80 md:text-lg"
+            className="mt-4 max-w-xl text-pretty text-base leading-relaxed opacity-80 sm:max-w-2xl md:text-lg"
           >
             Des feuilles de route claires, des ressources sélectionnées et un guidage concret. Commencez dès maintenant par le parcours DevOps.
           </motion.p>
@@ -131,11 +131,11 @@ export default function Home({ onNavigateToParcours, glowRef, handleMouseMove, a
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1, duration: 0.6 }}
-            className="mt-8 flex flex-wrap items-center gap-4"
+            className="mt-8 flex w-full flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4"
           >
             <button
               onClick={onNavigateToParcours}
-              className="group inline-flex items-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold shadow-lg transition focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+              className="group inline-flex w-full items-center justify-center gap-2 rounded-2xl px-6 py-3 text-sm font-semibold shadow-lg transition focus:outline-none focus:ring-2 focus:ring-[var(--accent)] sm:w-auto"
               style={{ background: `linear-gradient(180deg, var(--accent), #1746D1)`, boxShadow: `0 10px 30px ${accent}55`, color: "white" }}
             >
               Commencer le parcours DevOps
@@ -144,7 +144,7 @@ export default function Home({ onNavigateToParcours, glowRef, handleMouseMove, a
 
             <a
               href="#mission"
-              className="inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-white/50 px-5 py-3 text-sm font-semibold backdrop-blur transition hover:bg-white/70 dark:bg-zinc-900/50 dark:hover:bg-zinc-900"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-white/15 bg-white/60 px-6 py-3 text-sm font-semibold backdrop-blur transition hover:bg-white/80 dark:bg-zinc-900/60 dark:hover:bg-zinc-900 sm:w-auto"
             >
               Notre mission
             </a>
@@ -154,15 +154,16 @@ export default function Home({ onNavigateToParcours, glowRef, handleMouseMove, a
 
       {/* CHEMINS (DevOps) */}
       <section id="chemins" className="relative">
-        <div className="mx-auto max-w-7xl px-4 py-10 md:py-16 md:px-6">
-          <div className="mb-8 flex items-end justify-between">
-            <h2 className="text-2xl font-bold tracking-tight md:text-3xl">Parcours disponibles</h2>
+        <div className="mx-auto max-w-7xl px-4 py-8 md:py-16 md:px-6">
+          <div className="mb-6 flex flex-col gap-2 sm:mb-8 sm:flex-row sm:items-end sm:justify-between">
+            <h2 className="text-xl font-bold tracking-tight sm:text-2xl md:text-3xl">Parcours disponibles</h2>
             <span className="text-xs opacity-60">D'autres roadmaps arrivent</span>
           </div>
 
-          <p className="-mt-4 mb-8 text-sm opacity-70">À venir : Cybersécurité, Frontend, Backend, Data Scientist, IA/ML.</p>
+            <p className="-mt-2 mb-6 text-xs opacity-70 sm:text-sm">À venir : Cybersécurité, Frontend, Backend, Data Scientist, IA/ML.</p>
 
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {/* Mobile horizontal scroll */}
+          <div className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4 sm:hidden px-4">
             {paths.map(({ title, desc, icon: Icon }, i) => (
               <motion.button
                 key={title}
@@ -171,19 +172,37 @@ export default function Home({ onNavigateToParcours, glowRef, handleMouseMove, a
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.2 }}
                 transition={{ duration: 0.4, delay: i * 0.03 }}
-                className="group relative overflow-hidden rounded-3xl border border-white/10 bg-white/60 p-5 shadow-sm transition hover:shadow-xl dark:bg-zinc-900/60 text-left w-full"
+                className="group relative min-w-[240px] snap-start overflow-hidden rounded-3xl border border-white/10 bg-white/70 p-4 text-left shadow-sm transition hover:shadow-xl dark:bg-zinc-900/60"
               >
-                <span
-                  aria-hidden
-                  className="pointer-events-none absolute inset-0 rounded-3xl opacity-0 transition group-hover:opacity-100"
-                  style={{
-                    background: "linear-gradient(120deg, transparent 0%, transparent 30%, var(--accent) 50%, transparent 70%, transparent 100%)",
-                    maskImage: "linear-gradient(#000, #000)",
-                    WebkitMaskImage: "linear-gradient(#000, #000)",
-                    filter: "blur(12px)",
-                  }}
-                />
+                <div className="relative z-10 flex items-start gap-4">
+                  <div className="grid h-10 w-10 place-items-center rounded-2xl bg-white/70 shadow-sm dark:bg-zinc-950/60" style={{ boxShadow: `inset 0 0 0 1px ${accent}22` }}>
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-semibold tracking-tight">{title}</h3>
+                    <p className="mt-1 text-xs leading-relaxed opacity-80">{desc}</p>
+                  </div>
+                </div>
+                <div className="relative z-10 mt-5 flex items-center gap-2 text-xs font-medium opacity-80">
+                  Explorer
+                  <ChevronRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
+                </div>
+              </motion.button>
+            ))}
+          </div>
 
+          {/* Desktop / tablet grid */}
+          <div className="hidden grid-cols-2 gap-6 sm:grid lg:grid-cols-3">
+            {paths.map(({ title, desc, icon: Icon }, i) => (
+              <motion.button
+                key={title}
+                onClick={onNavigateToParcours}
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ duration: 0.4, delay: i * 0.03 }}
+                className="group relative overflow-hidden rounded-3xl border border-white/10 bg-white/60 p-5 text-left shadow-sm transition hover:shadow-xl dark:bg-zinc-900/60"
+              >
                 <div className="relative z-10 flex items-start gap-4">
                   <div className="grid h-12 w-12 place-items-center rounded-2xl bg-white/70 shadow-sm dark:bg-zinc-950/60" style={{ boxShadow: `inset 0 0 0 1px ${accent}22` }}>
                     <Icon className="h-6 w-6" />
@@ -193,13 +212,10 @@ export default function Home({ onNavigateToParcours, glowRef, handleMouseMove, a
                     <p className="mt-1 text-sm opacity-80">{desc}</p>
                   </div>
                 </div>
-
                 <div className="relative z-10 mt-6 flex items-center gap-2 text-sm font-medium opacity-80">
                   Explorer le parcours
                   <ChevronRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
                 </div>
-
-                <div aria-hidden className="absolute -bottom-20 left-1/2 h-40 w-40 -translate-x-1/2 rounded-full blur-2xl opacity-0 transition group-hover:opacity-40" style={{ background: `radial-gradient(closest-side, var(--accent), transparent)` }} />
               </motion.button>
             ))}
           </div>
@@ -243,7 +259,7 @@ export default function Home({ onNavigateToParcours, glowRef, handleMouseMove, a
                 Écrivez-nous et rejoignez une communauté qui se construit autour d'un objectif simple : partager des chemins clairs pour apprendre la tech, ensemble.
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
-                <a href="mailto:contact@lechemin.tech" className="inline-flex items-center gap-2 rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-zinc-900 transition hover:bg-zinc-100">Nous écrire</a>
+                <a href="mailto:mohamad@makhal.fr" className="inline-flex items-center gap-2 rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-zinc-900 transition hover:bg-zinc-100">Nous écrire</a>
                 <button onClick={onNavigateToParcours} className="inline-flex items-center gap-2 rounded-2xl border border-white/40 bg-white/10 px-5 py-3 text-sm font-semibold backdrop-blur transition hover:bg-white/20">Voir les parcours</button>
               </div>
             </div>

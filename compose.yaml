@@ -6,8 +6,8 @@ services:
       dockerfile: Dockerfile
       target: production
     container_name: lechemin_web
-    ports:
-      - "8080:80"   # http://localhost:8080
+    networks:
+      - npm_default
     restart: unless-stopped
     # Pas de volumes: image figée = build reproductible
 
@@ -26,8 +26,6 @@ services:
     restart: unless-stopped
     # Utilisation: docker compose up dev
 
-# Utilisation rapide:
-# 1) Production locale: docker compose up --build web
-#    -> http://localhost:8080
-# 2) Dev hot reload: docker compose up dev
-#    (Arrêter avec Ctrl+C, relance automatique au changement de code)
+networks:
+  npm_default:
+    external: true
