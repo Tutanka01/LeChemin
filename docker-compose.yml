@@ -1,0 +1,33 @@
+services:
+  web:
+    # Build et sert la version de production (nginx + fichiers statiques)
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: lechemin_web
+    ports:
+      - "8080:80"   # http://localhost:8080
+    restart: unless-stopped
+    # Pas de volumes: image figée = build reproductible
+
+  # Service de développement (hot reload) optionnel
+  dev:
+    image: node:20-alpine
+    working_dir: /app
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    ports:
+      - "5173:5173"  # Vite dev server
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - .:/app        # Monte le code local
+      - /app/node_modules
+    restart: unless-stopped
+    # Utilisation: docker compose up dev
+
+# Utilisation rapide:
+# 1) Production locale: docker compose up --build web
+#    -> http://localhost:8080
+# 2) Dev hot reload: docker compose up dev
+#    (Arrêter avec Ctrl+C, relance automatique au changement de code)

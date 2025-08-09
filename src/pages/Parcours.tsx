@@ -7,7 +7,6 @@ import {
   ServerCog,
   ChevronRight,
   Clock,
-  Users,
   BookOpen,
   Terminal,
   Cloud,
@@ -50,11 +49,11 @@ const devOpsPath: DevOpsStep[] = [
     difficulty: "Débutant",
     skills: ["Linux CLI", "SSH", "TCP/IP", "DNS", "Firewall", "Vim/Nano", "Cron"],
     resources: [
-      { type: "Livre", title: "The Linux Command Line (William Shotts)", url: "https://linuxcommand.org/tlcl.php" },
-      { type: "Cours", title: "Introduction to Linux - Linux Foundation (gratuit)", url: "https://www.edx.org/learn/linux/the-linux-foundation-introduction-to-linux" },
-      { type: "Interactive", title: "OverTheWire - Bandit (CLI Game)", url: "https://overthewire.org/wargames/bandit/" },
-      { type: "Cours", title: "Networking Essentials - Cisco", url: "https://www.netacad.com/courses/networking/networking-essentials" },
-      { type: "YouTube", title: "Linux Tutorial for Beginners", url: "https://www.youtube.com/watch?v=BMGixkvJ-6w" },
+      { type: "YouTube", title: "Formation Linux - Xavki (Référence)", url: "https://youtube.com/playlist?list=PLn6POgpklwWp1yRsq3-PyyisSIDg94ct9&si=ZocnNBoShfsUy14O" },
+      { type: "Livre", title: "Le Cahier de l'Admin Linux (français)", url: "https://debian-handbook.info/browse/fr-FR/stable/" },
+      { type: "Docs", title: "Documentation Ubuntu Server (français)", url: "https://doc.ubuntu-fr.org/serveur" },
+      { type: "Blog", title: "Les bases du réseau - IT-Connect", url: "https://www.it-connect.fr/cours-tutoriels/debuter-administration-systeme-reseau/" },
+      { type: "Interactive", title: "OverTheWire - Bandit (Jeu en anglais, mais culte)", url: "https://overthewire.org/wargames/bandit/" },
     ],
     icon: Terminal,
     color: "#10B981",
@@ -68,11 +67,11 @@ const devOpsPath: DevOpsStep[] = [
     difficulty: "Débutant",
     skills: ["Git", "GitHub", "GitLab", "Git Flow", "Pull Requests", "Merge Conflicts", "Git Hooks"],
     resources: [
-      { type: "Livre", title: "Pro Git (Gratuit en français)", url: "https://git-scm.com/book/fr/v2" },
-      { type: "Interactive", title: "Learn Git Branching (français)", url: "https://learngitbranching.js.org/?locale=fr_FR" },
-      { type: "Gratuit", title: "GitHub Skills - Parcours interactifs", url: "https://skills.github.com/" },
-      { type: "Cours", title: "Git et GitHub - OpenClassrooms", url: "https://openclassrooms.com/fr/courses/7162856-gerez-du-code-avec-git-et-github" },
-      { type: "Cheat Sheet", title: "Git Cheat Sheet - Atlassian", url: "https://www.atlassian.com/git/tutorials/atlassian-git-cheatsheet" },
+      { type: "YouTube", title: "Git et le versionning - Graven", url: "https://youtu.be/gp_k0UVOYMw?si=K1Q8QK4BcPsb4e-O" },
+      { type: "Interactive", title: "Learn Git Branching (Jeu interactif en français)", url: "https://learngitbranching.js.org/?locale=fr_FR" },
+      { type: "Livre", title: "Pro Git (La Bible de Git, gratuite et en français)", url: "https://git-scm.com/book/fr/v2" },
+      { type: "Cours", title: "Gérez du code avec Git et GitHub - OpenClassrooms", url: "https://openclassrooms.com/fr/courses/7162856-gerez-du-code-avec-git-et-github" },
+      { type: "Blog", title: "Le guide complet de Git et GitHub - Une Tasse de Café", url: "https://git.avec.une-tasse-de.cafe/" },
     ],
     icon: BookOpen,
     color: "#3B82F6",
@@ -86,11 +85,11 @@ const devOpsPath: DevOpsStep[] = [
     difficulty: "Intermédiaire",
     skills: ["Bash Scripting", "Python", "Cron Jobs", "Monitoring", "APIs REST", "Ansible", "Regex"],
     resources: [
-      { type: "Livre", title: "Automate the Boring Stuff with Python (gratuit)", url: "https://automatetheboringstuff.com/" },
-      { type: "Guide", title: "Advanced Bash-Scripting Guide", url: "https://tldp.org/LDP/abs/html/" },
-      { type: "Cours", title: "Ansible for Beginners - KodeKloud", url: "https://kodekloud.com/courses/ansible-for-the-absolute-beginner/" },
-      { type: "Interactive", title: "Python.org Tutorial", url: "https://docs.python.org/3/tutorial/" },
-      { type: "Pratique", title: "Bash Scripting Tutorial", url: "https://ryanstutorials.net/bash-scripting-tutorial/" },
+      { type: "YouTube", title: "Formation Scripting Bash - Xavki", url: "https://youtube.com/playlist?list=PLn6POgpklwWpGvmy-ddJeDxxw2-QZ-AGp&si=fhxTXnI5V7P8vjeb" },
+      { type: "Cours", title: "Apprenez les bases du langage Python - OpenClassrooms", url: "https://openclassrooms.com/fr/courses/7168871-apprenez-les-bases-du-langage-python" },
+      { type: "Blog", title: "Introduction à Ansible - Blog de Stéphane Robert", url: "https://blog.stephane-robert.info/docs/infra-as-code/gestion-de-configuration/ansible/" },
+      { type: "Docs", title: "Documentation Ansible (français)", url: "https://docs.ansible.com/ansible/latest/user_guide/index.html#getting-started" },
+      { type: "Interactive", title: "Regex101 (Testeur d'expressions régulières)", url: "https://regex101.com/" },
     ],
     icon: Zap,
     color: "#F59E0B",
@@ -104,11 +103,11 @@ const devOpsPath: DevOpsStep[] = [
     difficulty: "Intermédiaire",
     skills: ["Docker", "Kubernetes", "Container Registry", "Helm", "Microservices", "Docker Compose", "Podman"],
     resources: [
-      { type: "Cours", title: "Docker Curriculum (gratuit)", url: "https://docker-curriculum.com/" },
-      { type: "Interactive", title: "Kubernetes Basics - Tutorial officiel", url: "https://kubernetes.io/docs/tutorials/kubernetes-basics/" },
-      { type: "Cours", title: "Docker Mastery - Udemy", url: "https://www.udemy.com/course/docker-mastery/" },
-      { type: "Gratuit", title: "Play with Docker", url: "https://labs.play-with-docker.com/" },
-      { type: "Guide", title: "Kubernetes The Hard Way", url: "https://github.com/kelseyhightower/kubernetes-the-hard-way" },
+      { type: "YouTube", title: "Formation Docker - Xavki", url: "https://youtube.com/playlist?list=PLn6POgpklwWq0iz59-px2z-qjDdZKEvWd&si=6O_iVR9PY8oWwj0U" },
+      { type: "Docs", title: "Documentation officielle de Kubernetes (français)", url: "https://kubernetes.io/fr/docs/home/" },
+      { type: "Interactive", title: "Play with Docker / Kubernetes (Labs en ligne)", url: "https://labs.play-with-k8s.com/" },
+      { type: "Blog", title: "Formation Kubernetes - Stephane Robert", url: "https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/" },
+      { type: "Cours", title: "Déployez des applications avec Docker - OpenClassrooms", url: "https://openclassrooms.com/fr/courses/7141751-deployez-des-applications-avec-docker" },
     ],
     icon: ServerCog,
     color: "#8B5CF6",
@@ -122,11 +121,11 @@ const devOpsPath: DevOpsStep[] = [
     difficulty: "Intermédiaire",
     skills: ["AWS", "Terraform", "CloudFormation", "VPC", "Load Balancers", "IAM", "EC2", "S3"],
     resources: [
-      { type: "Gratuit", title: "AWS Free Tier", url: "https://aws.amazon.com/free/" },
-      { type: "Ateliers", title: "AWS Workshops (hands-on)", url: "https://workshops.aws/" },
-      { type: "Cours", title: "Terraform Tutorials - HashiCorp Learn", url: "https://developer.hashicorp.com/terraform/tutorials" },
-      { type: "Certification", title: "AWS Cloud Practitioner", url: "https://aws.amazon.com/certification/certified-cloud-practitioner/" },
-      { type: "Guide", title: "AWS Well-Architected Framework", url: "https://docs.aws.amazon.com/wellarchitected/" },
+      { type: "YouTube", title: "C'est quoi le Cloud - Cookie connecté", url: "https://youtu.be/RwbIMBSr8o8?si=SjoMYFYOGD2iJT5H" },
+      { type: "YouTube", title: "Formation Terraform - Xavki", url: "https://youtube.com/playlist?list=PLn6POgpklwWrpWnv05paAdqbFbV6gApHx&si=cWDhyxVPUTlBm1QT" },
+      { type: "Docs", title: "Documentation AWS en français", url: "https://docs.aws.amazon.com/index.html?nc2=h_ql_doc_do_v&language=fr_FR" },
+      { type: "Blog", title: "Commencer a deployer sur OVH", url: "https://moxyone.be/demarrer-avec-un-serveur-mutualise-ovh-sous-linux-guide-pour-les-debutants/" },
+      { type: "Blog", title: "Les guides Public Cloud d'OVHcloud (Pépite française)", url: "https://help.ovhcloud.com/csm/fr-public-cloud-compute-getting-started?id=kb_article_view&sysparm_article=KB0051011" },
     ],
     icon: Cloud,
     color: "#06B6D4",
@@ -140,11 +139,11 @@ const devOpsPath: DevOpsStep[] = [
     difficulty: "Avancé",
     skills: ["Jenkins", "GitHub Actions", "Pipeline as Code", "Testing", "Deployment", "GitLab CI", "ArgoCD"],
     resources: [
-      { type: "Docs", title: "GitHub Actions - Documentation officielle", url: "https://docs.github.com/fr/actions" },
-      { type: "Cours", title: "Jenkins Pipeline Tutorial", url: "https://www.jenkins.io/doc/book/pipeline/" },
-      { type: "Gratuit", title: "GitLab CI/CD Tutorial", url: "https://docs.gitlab.com/ee/ci/quick_start/" },
-      { type: "Certification", title: "CDF - Continuous Delivery Foundation", url: "https://cd.foundation/learn/" },
-      { type: "Pratique", title: "DevOps Pipeline Project", url: "https://github.com/mtararujs/python-devops" },
+      { type: "Docs", title: "Démarrage rapide de GitHub Actions (français)", url: "https://docs.github.com/fr/actions/quickstart" },
+      { type: "Docs", title: "Démarrage rapide de GitLab CI/CD (français)", url: "https://docs.gitlab.com/ee/ci/quick_start/index.html" },
+      { type: "YouTube", title: "Formation GitLab CI - Xavki", url: "https://youtube.com/playlist?list=PLn6POgpklwWrRoZZXv0xf71mvT4E0QDOF&si=voxbXlo3u4RlhRXe" },
+      { type: "Blog", title: "CI/CD, de la théorie à la pratique", url: "https://www.redhat.com/fr/topics/devops/what-is-ci-cd" },
+      { type: "Guide", title: "Introduction à ArgoCD (GitOps)", url: "https://argo-cd.readthedocs.io/en/stable/getting_started/" },
     ],
     icon: Target,
     color: "#EF4444",
@@ -158,11 +157,11 @@ const devOpsPath: DevOpsStep[] = [
     difficulty: "Avancé",
     skills: ["Security Scanning", "Prometheus", "Grafana", "ELK Stack", "Incident Response", "SIEM", "Vulnerability Assessment"],
     resources: [
-      { type: "Gratuit", title: "OWASP Top Ten 2021", url: "https://owasp.org/Top10/fr/" },
-      { type: "Docs", title: "Prometheus - Getting Started", url: "https://prometheus.io/docs/prometheus/latest/getting_started/" },
-      { type: "Cours", title: "Grafana Fundamentals", url: "https://grafana.com/tutorials/grafana-fundamentals/" },
-      { type: "Gratuit", title: "Elastic Stack Tutorial", url: "https://www.elastic.co/guide/en/elastic-stack-get-started/current/get-started-elastic-stack.html" },
-      { type: "Certification", title: "CompTIA Security+", url: "https://www.comptia.org/certifications/security" },
+      { type: "Référence", title: "Guides de l'ANSSI (L'Autorité française)", url: "https://www.ssi.gouv.fr/guide/" },
+      { type: "YouTube", title: "Formation Prometheus - Xavki", url: "https://youtube.com/playlist?list=PLn6POgpklwWo3_2pj5Jflqwla62P5OI8n&si=D3N6UHMQ9B0lH-7j" },
+      { type: "Blog", title: "Tutoriels Grafana - IT-Connect", url: "https://www.it-connect.fr/supervisez-votre-serveur-rapidement-avec-grafana-cloud/" },
+      { type: "Référence", title: "OWASP Top 10 (français)", url: "https://owasp.org/Top10/fr/" },
+      { type: "Blog", title: "Sécuriser son serveur SSH - Blog de Stéphane Robert", url: "https://blog.stephane-robert.info/docs/securiser/durcissement/ssh/" },
     ],
     icon: Shield,
     color: "#F97316",
@@ -351,18 +350,19 @@ export default function Parcours({ glowRef, handleMouseMove, accent, onNavigateH
                 Chaque module vous prépare au suivant avec des ressources sélectionnées.
               </p>
 
-              <div className="flex flex-wrap items-center justify-center gap-4">
-                <div className="flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm backdrop-blur">
-                  <Users className="h-4 w-4 text-green-500" />
-                  <span>+2,450 apprenants</span>
+              {/* Bloc de transparence authentique (remplace les métriques abstraites) */}
+              <div className="mx-auto mb-2 max-w-3xl text-sm italic opacity-70">
+                Pas de chiffres marketing artificiels — juste un chemin clair, vivant et améliorable.
+              </div>
+              <div className="flex flex-col items-center gap-3 sm:flex-row sm:flex-wrap sm:justify-center">
+                <div className="rounded-full bg-white/10 px-5 py-3 text-sm backdrop-blur dark:bg-white/5">
+                  Construit avec passion et maintenu en continu
                 </div>
-                <div className="flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm backdrop-blur">
-                  <Star className="h-4 w-4 text-yellow-500" />
-                  <span>4.8/5 étoiles</span>
+                <div className="rounded-full bg-white/10 px-5 py-3 text-sm backdrop-blur dark:bg-white/5">
+                  Basé sur +5 ans d'expérience combinée (Cloud, Dev, Ops)
                 </div>
-                <div className="flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm backdrop-blur">
-                  <Clock className="h-4 w-4 text-blue-500" />
-                  <span>24-30 semaines</span>
+                <div className="rounded-full bg-white/10 px-5 py-3 text-sm backdrop-blur dark:bg-white/5">
+                  Ressources ouvertes, priorisées & francophones quand possible
                 </div>
               </div>
             </motion.div>
