@@ -32,18 +32,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
     <!-- Données structurées JSON-LD -->
-    <script type="application/ld+json">
-      {"@context":"https://schema.org","@type":"WebSite","name":"LeChemin.tech","url":"https://lechemin.tech/","inLanguage":"fr","potentialAction":{"@type":"SearchAction","target":"https://lechemin.tech/?q={search_term_string}","query-input":"required name=search_term_string"}}
-    </script>
-    <script type="application/ld+json">
-      {"@context":"https://schema.org","@type":"Organization","name":"LeChemin.tech","url":"https://lechemin.tech/","logo":"https://lechemin.tech/logo.png","sameAs":["https://www.linkedin.com/company/lechemin","https://twitter.com/lechemin"]}
-    </script>
-    <script type="application/ld+json">
-      {"@context":"https://schema.org","@type":"Course","name":"Parcours DevOps","description":"Roadmap DevOps structurée: Linux, Git, Scripting, Docker, Kubernetes, Cloud, CI/CD, Sécurité & Observabilité.","provider":{"@type":"Organization","name":"LeChemin.tech","sameAs":"https://lechemin.tech/"},"educationalCredentialAwarded":"Compétences pratiques DevOps","inLanguage":"fr"}
-    </script>
-    <script type="application/ld+json">
-      {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Accueil","item":"https://lechemin.tech/"},{"@type":"ListItem","position":2,"name":"Parcours DevOps","item":"https://lechemin.tech/#devops"}]}
-    </script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"LeChemin.tech","url":"https://lechemin.tech/","inLanguage":"fr","potentialAction":{"@type":"SearchAction","target":"https://lechemin.tech/?q={search_term_string}","query-input":"required name=search_term_string"}}</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"LeChemin.tech","url":"https://lechemin.tech/","logo":"https://lechemin.tech/logo.png","sameAs":["https://www.linkedin.com/company/lechemin","https://twitter.com/lechemin"]}</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"Course","name":"Parcours DevOps","description":"Roadmap DevOps structurée: Linux, Git, Scripting, Docker, Kubernetes, Cloud, CI/CD, Sécurité & Observabilité.","provider":{"@type":"Organization","name":"LeChemin.tech","sameAs":"https://lechemin.tech/"},"educationalCredentialAwarded":"Compétences pratiques DevOps","inLanguage":"fr"}</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Accueil","item":"https://lechemin.tech/"},{"@type":"ListItem","position":2,"name":"Parcours DevOps","item":"https://lechemin.tech/parcours"}]}</script>
     <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml" />
   </head>
   <body class="dark">
@@ -53,6 +45,6 @@
       </div>
     </noscript>
     <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <script type="module" src="/src/home.tsx"></script>
   </body>
 </html>

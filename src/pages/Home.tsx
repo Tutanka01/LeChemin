@@ -1,21 +1,11 @@
-// LeChemin.tech — Page d'accueil
+// LeChemin.tech — Page d'accueil (MPA)
 // Homepage avec navigation vers les parcours
 
 import React from "react";
 import { motion } from "framer-motion";
-import {
-  ServerCog,
-  ChevronRight,
-  Compass,
-  BookOpenCheck,
-  ExternalLink,
-  Linkedin,
-  Twitter,
-} from "lucide-react";
+import { ServerCog, ChevronRight, Compass, BookOpenCheck, ExternalLink, Linkedin, Twitter } from "lucide-react";
 
 interface HomeProps {
-  isDark: boolean;
-  setIsDark: (dark: boolean) => void;
   onNavigateToParcours: () => void;
   glowRef: React.RefObject<HTMLDivElement>;
   handleMouseMove: (e: React.MouseEvent) => void;
@@ -23,7 +13,6 @@ interface HomeProps {
 }
 
 export default function Home({ onNavigateToParcours, glowRef, handleMouseMove, accent }: HomeProps) {
-  // v1: only DevOps
   const paths = [
     {
       title: "DevOps",
@@ -66,7 +55,7 @@ export default function Home({ onNavigateToParcours, glowRef, handleMouseMove, a
   return (
     <div
       style={{ ["--accent" as string]: accent }}
-      className="relative min-h-screen text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-100"
+      className="relative min-h-screen text-zinc-100 bg-zinc-950"
       onMouseMove={handleMouseMove}
     >
       <h1 className="sr-only">Roadmap DevOps & Cloud en Français – LeChemin.tech</h1>
@@ -123,7 +112,7 @@ export default function Home({ onNavigateToParcours, glowRef, handleMouseMove, a
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.05, duration: 0.6 }}
-            className="mt-4 max-w-xl text-pretty text-base leading-relaxed opacity-80 sm:max-w-2xl md:text-lg"
+            className="mt-4 max-w-xl text-pretty text-base leading-relaxed text-zinc-300 sm:max-w-2xl md:text-lg"
           >
             Des feuilles de route claires, des ressources sélectionnées et un guidage concret. Commencez dès maintenant par le parcours DevOps.
           </motion.p>
