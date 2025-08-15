@@ -1,12 +1,17 @@
 -- Extensions requises
 create extension if not exists pgcrypto;
 
--- Tables minimales pour la progression
-create table if not exists public.progress (
+-- Reset progress table (safe to re-run)
+drop table if exists public.progress cascade;
+
+create table public.progress (
   user_id uuid not null references auth.users(id) on delete cascade,
   module_id text not null,
   type text not null check (type in ('skill','resource')),
-  key text not null,
+  -- key compacte: ex "fondamentaux:skill:0:linux-cli"
+  key text not null check (
+    length(key) between 3 and 80 and key ~ '^[a-z0-9:-]+$'
+  ),
   completed boolean not null default false,
   updated_at timestamp with time zone default now(),
   primary key (user_id, module_id, type, key)

@@ -174,6 +174,19 @@ export default function Parcours() {
   const [copied, setCopied] = useState(false);
   const [progress, setProgressState] = useState<ProgressRecord[]>([]);
   const [notice, setNotice] = useState<string | null>(null);
+  // Helpers clefs compactes et stables
+  function slugify(s: string) {
+    return s
+      .toLowerCase()
+      .normalize('NFD').replace(/\p{Diacritic}/gu, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 48);
+  }
+  function keyFor(moduleId: string, type: 'skill'|'resource', value: string, index: number) {
+    // Index inclus pour stabilité si deux titres quasi identiques, tout en restant court
+    return `${moduleId}:${type}:${index.toString(36)}:${slugify(value)}`;
+  }
 
   useEffect(() => {
     (async () => {
@@ -251,7 +264,9 @@ export default function Parcours() {
 
   async function toggleAll(step: DevOpsStep, type: 'skill'|'resource', value: boolean) {
     if (!user) return;
-    const items = type === 'skill' ? step.skills : step.resources.map(r => r.url);
+    const items = type === 'skill'
+      ? step.skills.map((s, i) => keyFor(step.id, 'skill', s, i))
+      : step.resources.map((r, i) => keyFor(step.id, 'resource', r.title, i));
     // Optimistic batch
     items.forEach(k => updateLocal(step.id, type, k, value));
     try {
@@ -411,15 +426,16 @@ export default function Parcours() {
                 <button disabled={!user} onClick={() => toggleAll(selectedStep, 'skill', false)} className="rounded-lg border border-white/10 px-3 py-1 text-xs disabled:opacity-50">Tout décocher</button>
               </div>
               <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                {selectedStep.skills.map(skill => {
-                  const rec = progress.find(p => p.module_id === selectedStep.id && p.type === 'skill' && p.key === skill);
+                {selectedStep.skills.map((skill, i) => {
+                  const key = keyFor(selectedStep.id, 'skill', skill, i);
+                  const rec = progress.find(p => p.module_id === selectedStep.id && p.type === 'skill' && p.key === key);
                   const checked = Boolean(rec?.completed);
                   return (
                     <button
                       type="button"
                       key={skill}
                       disabled={!user}
-                      onClick={() => toggleItem(selectedStep.id, 'skill', skill, !checked)}
+                      onClick={() => toggleItem(selectedStep.id, 'skill', key, !checked)}
                       className={`flex items-center gap-3 rounded-xl border px-3 py-2 text-sm transition ${checked ? 'border-green-400/30 bg-green-500/10 text-green-200' : 'border-white/10 bg-white/5 text-zinc-200'} disabled:opacity-60`}
                     >
                       <span className={`grid h-6 w-6 place-items-center rounded-full border text-[10px] ${checked ? 'border-green-400/50 bg-green-500/30 text-white' : 'border-white/20 bg-white/10 text-white/70'}`}>
@@ -444,14 +460,15 @@ export default function Parcours() {
               </div>
               <div className="space-y-2">
                 {selectedStep.resources.map((r,i)=>{
-                  const rec = progress.find(p => p.module_id === selectedStep.id && p.type === 'resource' && p.key === r.url);
+                  const key = keyFor(selectedStep.id, 'resource', r.title, i);
+                  const rec = progress.find(p => p.module_id === selectedStep.id && p.type === 'resource' && p.key === key);
                   const checked = Boolean(rec?.completed);
                   return (
                     <div key={i} className={`flex items-center gap-3 rounded-xl border p-3 text-sm transition ${checked ? 'border-green-400/30 bg-green-500/10 text-green-200' : 'border-white/10 bg-white/5 text-zinc-200'}`}>
                       <button
                         type="button"
                         disabled={!user}
-                        onClick={() => toggleItem(selectedStep.id, 'resource', r.url, !checked)}
+                        onClick={() => toggleItem(selectedStep.id, 'resource', key, !checked)}
                         className={`grid h-7 w-7 place-items-center rounded-full border ${checked ? 'border-green-400/50 bg-green-500/30 text-white' : 'border-white/20 bg-white/10 text-white/70'} disabled:opacity-60`}
                         aria-label={checked ? 'Marqué comme vu' : 'Marquer comme vu'}
                       >

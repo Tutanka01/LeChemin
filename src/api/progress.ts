@@ -1,3 +1,4 @@
+// key: attendu court et stable (ex: `fondamentaux:skill:0:linux-cli`), pas d'URL/texte long
 import { supabase } from '../lib/supabase';
 
 export interface ProgressRecord {
