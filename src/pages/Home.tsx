@@ -2,17 +2,12 @@
 // Homepage avec navigation vers les parcours
 
 import React from "react";
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ServerCog, ChevronRight, Compass, BookOpenCheck, ExternalLink, Linkedin, Twitter } from "lucide-react";
+import { ServerCog, ChevronRight, Compass, BookOpenCheck, ExternalLink } from "lucide-react";
 
-interface HomeProps {
-  onNavigateToParcours: () => void;
-  glowRef: React.RefObject<HTMLDivElement>;
-  handleMouseMove: (e: React.MouseEvent) => void;
-  accent: string;
-}
-
-export default function Home({ onNavigateToParcours, glowRef, handleMouseMove, accent }: HomeProps) {
+export default function Home() {
+  const accent = '#0052FF';
   const paths = [
     {
       title: "DevOps",
@@ -53,48 +48,8 @@ export default function Home({ onNavigateToParcours, glowRef, handleMouseMove, a
   );
 
   return (
-    <div
-      style={{ ["--accent" as string]: accent }}
-      className="relative min-h-screen text-zinc-100 bg-zinc-950"
-      onMouseMove={handleMouseMove}
-    >
-      <h1 className="sr-only">Roadmap DevOps & Cloud en Français – LeChemin.tech</h1>
-      {/* Subtle static background */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div
-          className="absolute -top-32 left-1/2 h-[60rem] w-[60rem] -translate-x-1/2 rounded-full blur-3xl"
-          style={{ background: "radial-gradient(closest-side, var(--accent) 0%, transparent 60%)", opacity: 0.12 }}
-        />
-        <svg
-          className="absolute inset-0 h-full w-full opacity-[0.06] dark:opacity-[0.08]"
-          xmlns="http://www.w3.org/2000/svg"
-          preserveAspectRatio="none"
-        >
-          <defs>
-            <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-              <path d="M40 0H0V40" fill="none" stroke="currentColor" strokeWidth="0.5" />
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#grid)" />
-        </svg>
-      </div>
-
-      {/* GPU-friendly mouse-follow glow (behind everything) */}
-      <div
-        ref={glowRef}
-        data-testid="global-glow"
-        aria-hidden
-        className="pointer-events-none fixed z-0 h-[300px] w-[300px] rounded-full opacity-50 blur-2xl"
-        style={{
-          left: 0,
-          top: 0,
-          background: "radial-gradient(closest-side, var(--accent), transparent 70%)",
-          transform: "translate3d(-150px, -150px, 0)",
-          willChange: "transform",
-          mixBlendMode: "screen",
-        }}
-      />
-
+      // Sections spécifiques à la page (le fond + header/footer sont dans Layout)
+      <>
       {/* HERO */}
       <section className="relative pt-20">
         <div className="mx-auto max-w-7xl px-4 py-14 md:py-24 md:px-6">
@@ -123,14 +78,14 @@ export default function Home({ onNavigateToParcours, glowRef, handleMouseMove, a
             transition={{ delay: 0.1, duration: 0.6 }}
             className="mt-8 flex w-full flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4"
           >
-            <button
-              onClick={onNavigateToParcours}
+            <Link
+              to="/parcours"
               className="group inline-flex w-full items-center justify-center gap-2 rounded-2xl px-6 py-3 text-sm font-semibold shadow-lg transition focus:outline-none focus:ring-2 focus:ring-[var(--accent)] sm:w-auto"
               style={{ background: `linear-gradient(180deg, var(--accent), #1746D1)`, boxShadow: `0 10px 30px ${accent}55`, color: "white" }}
             >
               Commencer le parcours DevOps
               <ChevronRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
-            </button>
+            </Link>
 
             <a
               href="#mission"
@@ -142,7 +97,7 @@ export default function Home({ onNavigateToParcours, glowRef, handleMouseMove, a
         </div>
       </section>
 
-      {/* CHEMINS (DevOps) */}
+  {/* CHEMINS (DevOps) */}
       <section id="chemins" className="relative">
         <div className="mx-auto max-w-7xl px-4 py-8 md:py-16 md:px-6">
           <div className="mb-6 flex flex-col gap-2 sm:mb-8 sm:flex-row sm:items-end sm:justify-between">
@@ -155,9 +110,8 @@ export default function Home({ onNavigateToParcours, glowRef, handleMouseMove, a
           {/* Mobile horizontal scroll */}
           <div className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4 sm:hidden px-4">
             {paths.map(({ title, desc, icon: Icon }, i) => (
-              <motion.button
+              <motion.div
                 key={title}
-                onClick={onNavigateToParcours}
                 initial={{ opacity: 0, y: 16 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.2 }}
@@ -173,20 +127,18 @@ export default function Home({ onNavigateToParcours, glowRef, handleMouseMove, a
                     <p className="mt-1 text-xs leading-relaxed opacity-80">{desc}</p>
                   </div>
                 </div>
-                <div className="relative z-10 mt-5 flex items-center gap-2 text-xs font-medium opacity-80">
-                  Explorer
-                  <ChevronRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
-                </div>
-              </motion.button>
+                <Link to="/parcours" className="relative z-10 mt-5 inline-flex items-center gap-2 text-xs font-medium opacity-80">
+                  Explorer <ChevronRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
+                </Link>
+              </motion.div>
             ))}
           </div>
 
           {/* Desktop / tablet grid */}
           <div className="hidden grid-cols-2 gap-6 sm:grid lg:grid-cols-3">
             {paths.map(({ title, desc, icon: Icon }, i) => (
-              <motion.button
+              <motion.div
                 key={title}
-                onClick={onNavigateToParcours}
                 initial={{ opacity: 0, y: 16 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.2 }}
@@ -202,11 +154,10 @@ export default function Home({ onNavigateToParcours, glowRef, handleMouseMove, a
                     <p className="mt-1 text-sm opacity-80">{desc}</p>
                   </div>
                 </div>
-                <div className="relative z-10 mt-6 flex items-center gap-2 text-sm font-medium opacity-80">
-                  Explorer le parcours
-                  <ChevronRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
-                </div>
-              </motion.button>
+                <Link to="/parcours" className="relative z-10 mt-6 inline-flex items-center gap-2 text-sm font-medium opacity-80">
+                  Explorer le parcours <ChevronRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
+                </Link>
+              </motion.div>
             ))}
           </div>
         </div>
@@ -239,8 +190,8 @@ export default function Home({ onNavigateToParcours, glowRef, handleMouseMove, a
         </div>
       </section>
 
-      {/* CONTACT / CTA */}
-      <section id="contact" className="relative">
+    {/* CONTACT / CTA */}
+    <section id="contact" className="relative">
         <div className="mx-auto max-w-7xl px-4 py-10 md:py-16 md:px-6">
           <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-[var(--accent)] via-[var(--accent)]/70 to-zinc-900 p-8 text-white shadow-xl">
             <div className="relative z-10">
@@ -250,32 +201,13 @@ export default function Home({ onNavigateToParcours, glowRef, handleMouseMove, a
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
                 <a href="mailto:mohamad@makhal.fr" className="inline-flex items-center gap-2 rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-zinc-900 transition hover:bg-zinc-100">Nous écrire</a>
-                <button onClick={onNavigateToParcours} className="inline-flex items-center gap-2 rounded-2xl border border-white/40 bg-white/10 px-5 py-3 text-sm font-semibold backdrop-blur transition hover:bg-white/20">Voir les parcours</button>
+        <Link to="/parcours" className="inline-flex items-center gap-2 rounded-2xl border border-white/40 bg-white/10 px-5 py-3 text-sm font-semibold backdrop-blur transition hover:bg-white/20">Voir les parcours</Link>
               </div>
             </div>
             <div aria-hidden className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full opacity-60 blur-2xl" style={{ background: "radial-gradient(closest-side, white, transparent)" }} />
           </div>
         </div>
       </section>
-
-      {/* FOOTER */}
-      <footer className="border-t border-white/10 py-10">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-6 px-4 md:flex-row md:px-6">
-          <div className="flex items-center gap-2">
-            <div className="h-6 w-6 rounded-md" style={{ background: "linear-gradient(135deg, var(--accent), #1E1E1E)" }} />
-            <span className="text-sm font-semibold">LeChemin.tech</span>
-          </div>
-          <p className="text-center text-xs opacity-70 md:text-left">© 2025 LeChemin.tech — Une initiative pour rendre la connaissance accessible.</p>
-          <div className="flex items-center gap-3">
-            <a href="https://www.linkedin.com/" target="_blank" rel="noreferrer" className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 transition hover:bg-white/10" aria-label="LinkedIn" title="LinkedIn">
-              <Linkedin className="h-4 w-4" />
-            </a>
-            <a href="https://twitter.com/" target="_blank" rel="noreferrer" className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 transition hover:bg-white/10" aria-label="Twitter" title="Twitter/X">
-              <Twitter className="h-4 w-4" />
-            </a>
-          </div>
-        </div>
-      </footer>
-    </div>
+    </>
   );
 }
