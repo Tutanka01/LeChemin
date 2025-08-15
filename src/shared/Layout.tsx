@@ -1,19 +1,38 @@
 import React from 'react';
-import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
+import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, Moon, Sun, Linkedin, Twitter } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 export default function Layout() {
   const [isDark, setIsDark] = React.useState(true);
   const [open, setOpen] = React.useState(false);
   const glowRef = React.useRef<HTMLDivElement | null>(null);
+  const headerRef = React.useRef<HTMLElement | null>(null);
   const accent = '#0052FF';
   const { pathname } = useLocation();
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
 
   React.useEffect(() => {
     document.documentElement.classList.toggle('dark', isDark);
   }, [isDark]);
 
   React.useEffect(() => { setOpen(false); }, [pathname]);
+
+  // Mesure dynamique de la hauteur du header pour caler le menu mobile
+  React.useEffect(() => {
+    const updateHeaderVar = () => {
+      const h = headerRef.current?.offsetHeight ?? 60;
+      document.documentElement.style.setProperty('--header-bottom', `${h}px`);
+    };
+    updateHeaderVar();
+    window.addEventListener('resize', updateHeaderVar);
+    window.addEventListener('orientationchange', updateHeaderVar);
+    return () => {
+      window.removeEventListener('resize', updateHeaderVar);
+      window.removeEventListener('orientationchange', updateHeaderVar);
+    };
+  }, []);
 
   const onMouseMove = (e: React.MouseEvent) => {
     const el = glowRef.current; if (!el) return;
@@ -39,7 +58,7 @@ export default function Layout() {
 
       <div ref={glowRef} data-testid="global-glow" aria-hidden className="pointer-events-none fixed z-0 h-[300px] w-[300px] rounded-full opacity-30 blur-2xl" style={{ left: 0, top: 0, background: 'radial-gradient(closest-side, var(--accent), transparent 70%)', transform: 'translate3d(-150px, -150px, 0)', willChange: 'transform', mixBlendMode: 'screen' }} />
 
-      <header className="sticky top-0 z-50 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-zinc-950/60">
+  <header ref={headerRef} className="sticky top-0 z-50 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-zinc-950/60">
         <nav className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-3 md:py-4 md:px-6">
           <Link to="/" className="group inline-flex items-center gap-2" aria-label="Aller à l'accueil">
             <div className="h-7 w-7 rounded-lg" style={{ background: 'linear-gradient(135deg, var(--accent), #1E1E1E)' }} />
@@ -49,6 +68,20 @@ export default function Layout() {
             <NavLink to="/" className={activeClass} end>Accueil</NavLink>
             <NavLink to="/parcours" className={activeClass}>Parcours</NavLink>
             <a href="#contact" className="nav-link">Contact</a>
+            {!user ? (
+              <button
+                onClick={() => navigate('/auth')}
+                className="inline-flex items-center justify-center rounded-xl border border-blue-500/30 bg-blue-600/10 px-3 py-1.5 text-xs font-semibold text-blue-200 transition hover:bg-blue-600/20"
+                style={{ boxShadow: 'inset 0 0 0 1px rgba(0,82,255,.25)' }}
+              >
+                Connexion
+              </button>
+            ) : (
+              <div className="flex items-center gap-2">
+                <span className="text-xs opacity-80">{user.email}</span>
+                <button onClick={() => signOut()} className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/60 px-3 py-1 text-xs transition hover:bg-white/80 dark:bg-zinc-900/60 dark:hover:bg-zinc-900">Déconnexion</button>
+              </div>
+            )}
             <button onClick={() => setIsDark(v => !v)} aria-label="Basculer le thème" title="Basculer le thème" className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/60 transition hover:bg-white/80 dark:bg-zinc-900/60 dark:hover:bg-zinc-900">
               {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </button>
@@ -62,12 +95,26 @@ export default function Layout() {
             </button>
           </div>
         </nav>
-        <div id="mobile-menu" className={`md:hidden ${open ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'} transition-opacity duration-200`}>
-          <div className="mx-auto max-w-7xl px-4 pb-4">
-            <div className="rounded-2xl border border-white/10 bg-white/80 p-4 text-zinc-900 backdrop-blur dark:bg-zinc-900/80 dark:text-zinc-100">
+        <div
+          id="mobile-menu"
+          className={`md:hidden fixed inset-x-0 top-[var(--header-bottom,56px)] z-50 ${open ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'} transition-opacity duration-200`}
+          style={{
+            // Fallback si la var CSS n'est pas définie (approx hauteur header mobile)
+            // La valeur exacte est ~56-64px selon padding. On ajuste à 60.
+            // Défini dynamiquement ci-dessous via style tag.
+          } as React.CSSProperties}
+        >
+          <div className={`absolute inset-0 ${open ? 'bg-black/30' : 'bg-transparent'}`} aria-hidden onClick={() => setOpen(false)} />
+          <div className="relative mx-auto max-w-7xl px-4 pb-4">
+            <div className="mt-2 rounded-2xl border border-white/10 bg-white/85 p-4 text-zinc-900 backdrop-blur-md dark:bg-zinc-900/85 dark:text-zinc-100">
               <NavLink to="/" className="block py-2 text-base font-medium" onClick={() => setOpen(false)} end>Accueil</NavLink>
               <NavLink to="/parcours" className="block py-2 text-base font-medium" onClick={() => setOpen(false)}>Parcours</NavLink>
               <a href="#contact" className="block py-2 text-base font-medium" onClick={() => setOpen(false)}>Contact</a>
+              {!user ? (
+                <button onClick={() => { setOpen(false); navigate('/auth'); }} className="mt-2 w-full rounded-xl border border-blue-500/30 bg-blue-600/10 px-4 py-2 text-sm font-semibold text-blue-200 transition hover:bg-blue-600/20">Connexion</button>
+              ) : (
+                <button onClick={() => { setOpen(false); signOut(); }} className="mt-2 w-full rounded-xl border border-white/10 bg-white/60 px-4 py-2 text-sm font-semibold transition hover:bg-white/80 dark:bg-zinc-900/60 dark:hover:bg-zinc-900">Déconnexion</button>
+              )}
             </div>
           </div>
         </div>
@@ -100,6 +147,9 @@ export default function Layout() {
         .nav-link:hover { opacity: 1; }
         .nav-link::after { content: ""; position: absolute; left: 0; right: 0; bottom: -6px; height: 2px; background: var(--accent); transform: scaleX(0); transform-origin: right; transition: transform .2s ease; }
         .nav-link:hover::after { transform: scaleX(1); transform-origin: left; }
+        @media (max-width: 767px) {
+          :root { --header-bottom: 60px; }
+        }
       `}</style>
     </div>
   );
