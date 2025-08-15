@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { isSupabaseConfigured } from '../../lib/supabase';
 
 export default function AuthPage() {
-  const { signIn, signUp, signInWithGithub } = useAuth() as any;
+  const { signIn, signUp, signInWithGithub, signInWithGoogle } = useAuth() as any;
   const navigate = useNavigate();
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [email, setEmail] = useState('');
@@ -56,6 +56,11 @@ export default function AuthPage() {
         <button onClick={() => signInWithGithub()} className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/70 px-4 py-2 text-sm font-semibold backdrop-blur transition hover:bg-white/80 dark:bg-zinc-900/60 dark:hover:bg-zinc-900">
           <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden focusable="false" className="opacity-80"><path fill="currentColor" d="M12 .5C5.73.5.98 5.24.98 11.5c0 4.85 3.15 8.96 7.51 10.41.55.1.75-.24.75-.53 0-.26-.01-1.13-.02-2.05-3.05.66-3.69-1.29-3.69-1.29-.5-1.27-1.22-1.61-1.22-1.61-.99-.68.08-.66.08-.66 1.09.08 1.67 1.12 1.67 1.12.98 1.67 2.58 1.19 3.21.91.1-.71.38-1.19.68-1.46-2.43-.28-4.98-1.22-4.98-5.43 0-1.2.43-2.18 1.12-2.95-.11-.28-.48-1.41.11-2.93 0 0 .91-.29 2.98 1.13a10.3 10.3 0 0 1 5.43 0c2.07-1.42 2.98-1.13 2.98-1.13.59 1.52.22 2.65.11 2.93.69.77 1.12 1.75 1.12 2.95 0 4.22-2.56 5.15-5 5.43.39.34.73 1 .73 2.03 0 1.46-.01 2.64-.01 3 0 .29.2.64.76.53A10.52 10.52 0 0 0 23 11.5C23 5.24 18.27.5 12 .5z"/></svg>
           Continuer avec GitHub
+        </button>
+        <div className="mt-2" />
+        <button onClick={() => signInWithGoogle()} className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/70 px-4 py-2 text-sm font-semibold backdrop-blur transition hover:bg-white/80 dark:bg-zinc-900/60 dark:hover:bg-zinc-900">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="16" height="16" className="opacity-80" aria-hidden focusable="false"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303C33.602,31.912,29.278,35,24,35c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C33.64,5.053,28.983,3,24,3C12.955,3,4,11.955,4,23s8.955,20,20,20s20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,16.108,18.961,13,24,13c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C33.64,5.053,28.983,3,24,3C16.318,3,9.656,7.337,6.306,14.691z"/><path fill="#4CAF50" d="M24,43c5.207,0,9.8-1.988,13.292-5.229l-6.146-5.2C29.877,33.091,27.104,34,24,34c-5.259,0-9.566-3.105-11.189-7.409l-6.561,5.054C9.646,40.556,16.226,43,24,43z"/><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-1.627,4.088-5.951,7-11.303,7c-5.259,0-9.566-3.105-11.189-7.409l-6.561,5.054C9.646,40.556,16.226,43,24,43c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/></svg>
+          Continuer avec Google
         </button>
         <div className="mt-4 text-center text-sm">
           {mode === 'login' ? (
