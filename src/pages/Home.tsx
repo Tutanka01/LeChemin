@@ -54,17 +54,11 @@ export default function Home() {
       // Sections spécifiques à la page (le fond + header/footer sont dans Layout)
       <>
       {/* HERO */}
-      <section className="relative pt-20">
-        <div className="mx-auto max-w-7xl px-4 py-14 md:py-24 md:px-6">
-          <motion.h1
-            data-testid="hero-title"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-balance text-3xl font-black leading-[1.05] tracking-tight sm:text-4xl md:text-6xl"
-          >
-            La boussole moderne pour les métiers tech
-          </motion.h1>
+      <section className="relative pt-14 md:pt-16">
+        <div className="mx-auto max-w-7xl px-4 py-10 md:py-16 md:px-6">
+
+          {/* Titre avec effet typewriter */}
+          <HeroTitle />
 
           <motion.p
             initial={{ opacity: 0, y: 10 }}
@@ -237,6 +231,66 @@ export default function Home() {
         </div>
       </section>
     </>
+  );
+}
+
+// --- Hero avec mots qui s'écrivent ---
+function HeroTitle() {
+  // Cibles complètes incluant l'article pour participer au typing (en bleu)
+  const targets = React.useMemo(() => ["le DevOps", "le Cloud", "la Cybersécurité"], []);
+  const [idx, setIdx] = React.useState(0);
+  const [text, setText] = React.useState("");
+  const [deleting, setDeleting] = React.useState(false);
+
+  React.useEffect(() => {
+    let timer: number | undefined;
+  const current = targets[idx % targets.length];
+  // Vitesse légèrement ralentie et plus confortable
+  const baseTyping = 100;
+  const baseDeleting = 70;
+  const jitter = 50;
+  const delta = (deleting ? baseDeleting : baseTyping) + Math.random() * jitter;
+
+    if (!deleting && text.length < current.length) {
+      timer = window.setTimeout(() => setText(current.slice(0, text.length + 1)), delta);
+    } else if (!deleting && text.length === current.length) {
+      timer = window.setTimeout(() => setDeleting(true), 1600);
+    } else if (deleting && text.length > 0) {
+      timer = window.setTimeout(() => setText(current.slice(0, text.length - 1)), delta);
+    } else if (deleting && text.length === 0) {
+      setDeleting(false);
+    setIdx((i) => (i + 1) % targets.length);
+    }
+    return () => {
+      if (typeof timer !== 'undefined') {
+        window.clearTimeout(timer);
+      }
+    };
+  }, [text, deleting, idx, targets]);
+
+  return (
+    <motion.h1
+      data-testid="hero-title"
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+      className="text-balance text-3xl font-black leading-[1.05] tracking-tight sm:text-4xl md:text-6xl"
+    >
+      Des parcours clairs pour
+      <span className="block sm:inline"> </span>
+      <span className="relative inline-flex items-baseline">
+        <span className="relative z-10 bg-gradient-to-r from-[var(--accent)] to-[#7C3AED] bg-clip-text text-transparent">
+          {text || "\u00A0"}
+          {text.length > 0 && (
+            <span aria-hidden className="pointer-events-none absolute inset-x-0 -bottom-1 h-2 rounded-full bg-gradient-to-r from-blue-500/20 to-purple-500/20 blur-sm" />
+          )}
+        </span>
+        <span className="ml-1 inline-block h-[1em] w-[2px] translate-y-[2px] animate-[caret_1s_steps(2)_infinite] bg-[var(--accent)] align-baseline" aria-hidden />
+      </span>
+      <style>{`
+        @keyframes caret { 50% { opacity: 0; } }
+      `}</style>
+    </motion.h1>
   );
 }
 

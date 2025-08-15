@@ -138,7 +138,7 @@ export default function Layout() {
           </div>
           <p className="text-center text-xs opacity-70 md:text-left">© {new Date().getFullYear()} LeChemin.tech — Une initiative pour rendre la connaissance accessible.</p>
           <div className="flex items-center gap-3">
-    <a href="https://www.linkedin.com/" target="_blank" rel="noreferrer" className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-zinc-200/70 transition hover:bg-zinc-100 dark:border-white/10 dark:hover:bg-white/10" aria-label="LinkedIn" title="LinkedIn">
+    <a href="https://www.linkedin.com/in/mohamad-el-akhal/" target="_blank" rel="noreferrer" className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-zinc-200/70 transition hover:bg-zinc-100 dark:border-white/10 dark:hover:bg-white/10" aria-label="LinkedIn" title="LinkedIn">
               <Linkedin className="h-4 w-4" />
             </a>
     <a href="https://twitter.com/" target="_blank" rel="noreferrer" className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-zinc-200/70 transition hover:bg-zinc-100 dark:border-white/10 dark:hover:bg-white/10" aria-label="Twitter" title="Twitter/X">
