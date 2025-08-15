@@ -70,7 +70,7 @@ export default function Home() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.05, duration: 0.6 }}
-            className="mt-4 max-w-xl text-pretty text-base leading-relaxed text-zinc-300 sm:max-w-2xl md:text-lg"
+            className="mt-4 max-w-xl text-pretty text-base leading-relaxed text-zinc-600 sm:max-w-2xl md:text-lg dark:text-zinc-300"
           >
             Des feuilles de route claires, des ressources sélectionnées et un guidage concret. Commencez dès maintenant par le parcours DevOps.
           </motion.p>
@@ -92,14 +92,14 @@ export default function Home() {
 
             <a
               href="#mission"
-              className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-white/15 bg-white/60 px-6 py-3 text-sm font-semibold backdrop-blur transition hover:bg-white/80 dark:bg-zinc-900/60 dark:hover:bg-zinc-900 sm:w-auto"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-zinc-200/70 bg-white px-6 py-3 text-sm font-semibold backdrop-blur transition hover:bg-zinc-50 dark:border-white/15 dark:bg-zinc-900/60 dark:hover:bg-zinc-900 sm:w-auto"
             >
               Notre mission
             </a>
           </motion.div>
 
           {!user && (
-            <div className="mt-3 text-sm text-zinc-400">
+            <div className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">
               <Link
                 to="/auth"
                 className="font-medium text-[var(--accent)] underline-offset-4 hover:underline"
@@ -140,10 +140,10 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.2 }}
                 transition={{ duration: 0.4, delay: i * 0.03 }}
-                className="group relative min-w-[240px] snap-start overflow-hidden rounded-3xl border border-white/10 bg-white/70 p-4 text-left shadow-sm transition hover:shadow-xl dark:bg-zinc-900/60"
+                className="group relative min-w-[240px] snap-start overflow-hidden rounded-3xl border border-zinc-200/70 bg-white p-4 text-left shadow-sm transition hover:shadow-xl dark:border-white/10 dark:bg-zinc-900/60"
               >
                 <div className="relative z-10 flex items-start gap-4">
-                  <div className="grid h-10 w-10 place-items-center rounded-2xl bg-white/70 shadow-sm dark:bg-zinc-950/60" style={{ boxShadow: `inset 0 0 0 1px ${accent}22` }}>
+                  <div className="grid h-10 w-10 place-items-center rounded-2xl bg-zinc-50 shadow-sm ring-1 ring-zinc-200/70 dark:bg-zinc-950/60 dark:ring-0" style={{ boxShadow: `inset 0 0 0 1px ${accent}22` }}>
                     <Icon className="h-5 w-5" />
                   </div>
                   <div>
@@ -169,10 +169,10 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.2 }}
                 transition={{ duration: 0.4, delay: i * 0.03 }}
-                className="group relative overflow-hidden rounded-3xl border border-white/10 bg-white/60 p-5 text-left shadow-sm transition hover:shadow-xl dark:bg-zinc-900/60"
+                className="group relative overflow-hidden rounded-3xl border border-zinc-200/70 bg-white p-5 text-left shadow-sm transition hover:shadow-xl dark:border-white/10 dark:bg-zinc-900/60"
               >
                 <div className="relative z-10 flex items-start gap-4">
-                  <div className="grid h-12 w-12 place-items-center rounded-2xl bg-white/70 shadow-sm dark:bg-zinc-950/60" style={{ boxShadow: `inset 0 0 0 1px ${accent}22` }}>
+                  <div className="grid h-12 w-12 place-items-center rounded-2xl bg-zinc-50 shadow-sm ring-1 ring-zinc-200/70 dark:bg-zinc-950/60 dark:ring-0" style={{ boxShadow: `inset 0 0 0 1px ${accent}22` }}>
                     <Icon className="h-6 w-6" />
                   </div>
                   <div>
@@ -208,7 +208,7 @@ export default function Home() {
             <Step n={3} title="Accéder aux ressources" desc="Guides, outils, communautés et opportunités." Icon={ExternalLink} />
           </div>
 
-          <div className="mt-12 rounded-3xl border border-white/10 bg-white/50 p-6 dark:bg-zinc-900/60">
+          <div className="mt-12 rounded-3xl border border-zinc-200/70 bg-white p-6 dark:border-white/10 dark:bg-zinc-900/60">
             <p className="text-pretty text-sm leading-relaxed opacity-90">
               <span className="font-semibold">Notre mission.</span> Rendre l'orientation et l'apprentissage tech simples, accessibles et fiables.
               Nous croyons aux parcours clairs, aux ressources vérifiées, et à l'exigence bienveillante : pour que chacun puisse trouver <em>son</em>
@@ -221,7 +221,7 @@ export default function Home() {
     {/* CONTACT / CTA */}
     <section id="contact" className="relative">
         <div className="mx-auto max-w-7xl px-4 py-10 md:py-16 md:px-6">
-          <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-[var(--accent)] via-[var(--accent)]/70 to-zinc-900 p-8 text-white shadow-xl">
+          <div className="relative overflow-hidden rounded-3xl border border-zinc-200/70 bg-gradient-to-br from-[var(--accent)] via-[var(--accent)]/80 to-zinc-700 p-8 text-white shadow-xl dark:border-white/10 dark:to-zinc-900">
             <div className="relative z-10">
               <h3 className="text-2xl font-bold tracking-tight md:text-3xl">Une question ? Une collaboration ?</h3>
               <p className="mt-2 max-w-2xl text-sm/relaxed opacity-90">
@@ -262,8 +262,8 @@ function WaitlistCard({ variant }: { variant: 'mobile' | 'desktop' }) {
 
   const isMobile = variant === 'mobile';
   const outerCls = isMobile
-    ? 'group relative min-w-[240px] snap-start overflow-hidden rounded-3xl border border-white/10 bg-white/70 p-4 text-left shadow-sm transition hover:shadow-xl dark:bg-zinc-900/60'
-    : 'group relative overflow-hidden rounded-3xl border border-white/10 bg-white/60 p-5 text-left shadow-sm transition hover:shadow-xl dark:bg-zinc-900/60';
+    ? 'group relative min-w-[240px] snap-start overflow-hidden rounded-3xl border border-zinc-200/70 bg-white p-4 text-left shadow-sm transition hover:shadow-xl dark:border-white/10 dark:bg-zinc-900/60'
+    : 'group relative overflow-hidden rounded-3xl border border-zinc-200/70 bg-white p-5 text-left shadow-sm transition hover:shadow-xl dark:border-white/10 dark:bg-zinc-900/60';
 
   return (
     <motion.div
@@ -274,17 +274,17 @@ function WaitlistCard({ variant }: { variant: 'mobile' | 'desktop' }) {
       className={outerCls}
     >
       <div className="relative z-10 flex items-start gap-4">
-        <div className="grid h-12 w-12 place-items-center rounded-2xl bg-blue-600/15 text-blue-300 ring-1 ring-blue-500/25">
+        <div className="grid h-12 w-12 place-items-center rounded-2xl bg-blue-50 text-blue-600 ring-1 ring-blue-200 dark:bg-blue-600/15 dark:text-blue-300 dark:ring-blue-500/25">
           <Bell className="h-6 w-6" />
         </div>
         <div className="flex-1">
           <div className="flex items-center gap-2">
             <h3 className="text-lg font-semibold tracking-tight">Cybersécurité</h3>
-            <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white/80 ring-1 ring-white/20">Bientôt</span>
+            <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-blue-700 ring-1 ring-blue-200 dark:bg-white/10 dark:text-white/80 dark:ring-white/20">Bientôt</span>
           </div>
           <p className="mt-1 text-sm opacity-80">Recevez une notification à l'ouverture du parcours.</p>
           {!open && status !== 'ok' && (
-            <button type="button" onClick={() => setOpen(true)} className="mt-4 inline-flex items-center gap-2 rounded-xl border border-blue-500/30 bg-blue-600/10 px-3 py-2 text-xs font-semibold text-blue-200 transition hover:bg-blue-600/20">
+            <button type="button" onClick={() => setOpen(true)} className="mt-4 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500/30 dark:border-blue-500/30 dark:bg-blue-600/10 dark:text-blue-200 dark:hover:bg-blue-600/20">
               Prévenez-moi
             </button>
           )}
@@ -302,7 +302,7 @@ function WaitlistCard({ variant }: { variant: 'mobile' | 'desktop' }) {
                 placeholder="votre@email.com"
                 value={email}
                 onChange={e=>setEmail(e.target.value)}
-                className="w-full rounded-xl border border-white/20 bg-white/70 px-3 py-2 text-sm outline-none dark:bg-zinc-950/60"
+                className="w-full rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500/30 dark:border-white/20 dark:bg-zinc-950/60"
               />
               <div className="flex items-center gap-2">
                 <button disabled={status==='loading'} className="inline-flex items-center justify-center rounded-xl bg-blue-600 px-3 py-2 text-xs font-semibold text-white disabled:opacity-60">{status==='loading' ? 'Envoi…' : 'S’inscrire'}</button>

@@ -4,7 +4,10 @@ import { Menu, X, Moon, Sun, Linkedin, Twitter } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export default function Layout() {
-  const [isDark, setIsDark] = React.useState(true);
+  // Initialise à partir de la classe HTML (définie tôt dans index.html) pour éviter le FOUC
+  const [isDark, setIsDark] = React.useState(() =>
+    typeof document !== 'undefined' ? document.documentElement.classList.contains('dark') : true
+  );
   const [open, setOpen] = React.useState(false);
   const glowRef = React.useRef<HTMLDivElement | null>(null);
   const headerRef = React.useRef<HTMLElement | null>(null);
@@ -15,6 +18,10 @@ export default function Layout() {
 
   React.useEffect(() => {
     document.documentElement.classList.toggle('dark', isDark);
+    try { localStorage.setItem('theme', isDark ? 'dark' : 'light'); } catch {}
+    // Met à jour la couleur de la barre système mobile
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', isDark ? '#0a0a0b' : '#ffffff');
   }, [isDark]);
 
   React.useEffect(() => { setOpen(false); }, [pathname]);
@@ -45,7 +52,7 @@ export default function Layout() {
   return (
     <div
       style={{ ["--accent" as any]: accent } as React.CSSProperties}
-      className="relative min-h-screen text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-100"
+  className="relative min-h-screen bg-zinc-50 text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-100"
       onMouseMove={onMouseMove}
     >
       <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -58,7 +65,7 @@ export default function Layout() {
 
       <div ref={glowRef} data-testid="global-glow" aria-hidden className="pointer-events-none fixed z-0 h-[300px] w-[300px] rounded-full opacity-30 blur-2xl" style={{ left: 0, top: 0, background: 'radial-gradient(closest-side, var(--accent), transparent 70%)', transform: 'translate3d(-150px, -150px, 0)', willChange: 'transform', mixBlendMode: 'screen' }} />
 
-  <header ref={headerRef} className="sticky top-0 z-50 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-zinc-950/60">
+  <header ref={headerRef} className="sticky top-0 z-50 border-b border-zinc-200/70 bg-white/70 backdrop-blur supports-[backdrop-filter]:bg-white/70 dark:border-white/10 dark:bg-zinc-950/60">
         <nav className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-3 md:py-4 md:px-6">
           <Link to="/" className="group inline-flex items-center gap-2" aria-label="Aller à l'accueil">
             <div className="h-7 w-7 rounded-lg" style={{ background: 'linear-gradient(135deg, var(--accent), #1E1E1E)' }} />
@@ -71,26 +78,25 @@ export default function Layout() {
             {!user ? (
               <button
                 onClick={() => navigate('/auth')}
-                className="inline-flex items-center justify-center rounded-xl border border-blue-500/30 bg-blue-600/10 px-3 py-1.5 text-xs font-semibold text-blue-200 transition hover:bg-blue-600/20"
-                style={{ boxShadow: 'inset 0 0 0 1px rgba(0,82,255,.25)' }}
+                className="inline-flex items-center justify-center rounded-xl bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-blue-700 dark:border-blue-500/30 dark:bg-blue-600/10 dark:text-blue-200 dark:hover:bg-blue-600/20"
               >
                 Connexion
               </button>
             ) : (
               <div className="flex items-center gap-2">
                 <span className="text-xs opacity-80">{user.email}</span>
-                <button onClick={() => signOut()} className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/60 px-3 py-1 text-xs transition hover:bg-white/80 dark:bg-zinc-900/60 dark:hover:bg-zinc-900">Déconnexion</button>
+                <button onClick={() => signOut()} className="inline-flex items-center justify-center rounded-xl border border-zinc-200/70 bg-white px-3 py-1 text-xs transition hover:bg-zinc-50 dark:border-white/10 dark:bg-zinc-900/60 dark:hover:bg-zinc-900">Déconnexion</button>
               </div>
             )}
-            <button onClick={() => setIsDark(v => !v)} aria-label="Basculer le thème" title="Basculer le thème" className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/60 transition hover:bg-white/80 dark:bg-zinc-900/60 dark:hover:bg-zinc-900">
+            <button onClick={() => setIsDark(v => !v)} aria-label="Basculer le thème" title="Basculer le thème" className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-zinc-200/70 bg-white transition hover:bg-zinc-50 dark:border-white/10 dark:bg-zinc-900/60 dark:hover:bg-zinc-900">
               {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </button>
           </div>
           <div className="flex items-center gap-2 md:hidden">
-            <button onClick={() => setIsDark(v => !v)} aria-label="Basculer le thème" title="Basculer le thème" className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/60 transition hover:bg-white/80 dark:bg-zinc-900/60 dark:hover:bg-zinc-900">
+            <button onClick={() => setIsDark(v => !v)} aria-label="Basculer le thème" title="Basculer le thème" className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-zinc-200/70 bg-white transition hover:bg-zinc-50 dark:border-white/10 dark:bg-zinc-900/60 dark:hover:bg-zinc-900">
               {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </button>
-            <button type="button" className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/50 p-2 text-zinc-900 transition hover:bg-white/70 dark:bg-zinc-900/60 dark:text-zinc-100 dark:hover:bg-zinc-900" aria-label="Ouvrir le menu" aria-controls="mobile-menu" aria-expanded={open} onClick={() => setOpen(v => !v)}>
+            <button type="button" className="inline-flex items-center justify-center rounded-xl border border-zinc-200/70 bg-white p-2 text-zinc-900 transition hover:bg-zinc-50 dark:border-white/10 dark:bg-zinc-900/60 dark:text-zinc-100 dark:hover:bg-zinc-900" aria-label="Ouvrir le menu" aria-controls="mobile-menu" aria-expanded={open} onClick={() => setOpen(v => !v)}>
               {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
           </div>
@@ -106,14 +112,14 @@ export default function Layout() {
         >
           <div className={`absolute inset-0 ${open ? 'bg-black/30' : 'bg-transparent'}`} aria-hidden onClick={() => setOpen(false)} />
           <div className="relative mx-auto max-w-7xl px-4 pb-4">
-            <div className="mt-2 rounded-2xl border border-white/10 bg-white/85 p-4 text-zinc-900 backdrop-blur-md dark:bg-zinc-900/85 dark:text-zinc-100">
+            <div className="mt-2 rounded-2xl border border-zinc-200/70 bg-white/90 p-4 text-zinc-900 backdrop-blur-md dark:border-white/10 dark:bg-zinc-900/85 dark:text-zinc-100">
               <NavLink to="/" className="block py-2 text-base font-medium" onClick={() => setOpen(false)} end>Accueil</NavLink>
               <NavLink to="/parcours" className="block py-2 text-base font-medium" onClick={() => setOpen(false)}>Parcours</NavLink>
               <a href="#contact" className="block py-2 text-base font-medium" onClick={() => setOpen(false)}>Contact</a>
               {!user ? (
-                <button onClick={() => { setOpen(false); navigate('/auth'); }} className="mt-2 w-full rounded-xl border border-blue-500/30 bg-blue-600/10 px-4 py-2 text-sm font-semibold text-blue-200 transition hover:bg-blue-600/20">Connexion</button>
+                <button onClick={() => { setOpen(false); navigate('/auth'); }} className="mt-2 w-full rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 dark:border-blue-500/30 dark:bg-blue-600/10 dark:text-blue-200 dark:hover:bg-blue-600/20">Connexion</button>
               ) : (
-                <button onClick={() => { setOpen(false); signOut(); }} className="mt-2 w-full rounded-xl border border-white/10 bg-white/60 px-4 py-2 text-sm font-semibold transition hover:bg-white/80 dark:bg-zinc-900/60 dark:hover:bg-zinc-900">Déconnexion</button>
+                <button onClick={() => { setOpen(false); signOut(); }} className="mt-2 w-full rounded-xl border border-zinc-200/70 bg-white px-4 py-2 text-sm font-semibold transition hover:bg-zinc-50 dark:border-white/10 dark:bg-zinc-900/60 dark:hover:bg-zinc-900">Déconnexion</button>
               )}
             </div>
           </div>
@@ -124,7 +130,7 @@ export default function Layout() {
         <Outlet />
       </main>
 
-      <footer id="contact" className="border-t border-white/10 py-10">
+  <footer id="contact" className="border-t border-zinc-200/70 py-10 dark:border-white/10">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-6 px-4 md:flex-row md:px-6">
           <div className="flex items-center gap-2">
             <div className="h-6 w-6 rounded-md" style={{ background: 'linear-gradient(135deg, var(--accent), #1E1E1E)' }} />
@@ -132,10 +138,10 @@ export default function Layout() {
           </div>
           <p className="text-center text-xs opacity-70 md:text-left">© {new Date().getFullYear()} LeChemin.tech — Une initiative pour rendre la connaissance accessible.</p>
           <div className="flex items-center gap-3">
-            <a href="https://www.linkedin.com/" target="_blank" rel="noreferrer" className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 transition hover:bg-white/10" aria-label="LinkedIn" title="LinkedIn">
+    <a href="https://www.linkedin.com/" target="_blank" rel="noreferrer" className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-zinc-200/70 transition hover:bg-zinc-100 dark:border-white/10 dark:hover:bg-white/10" aria-label="LinkedIn" title="LinkedIn">
               <Linkedin className="h-4 w-4" />
             </a>
-            <a href="https://twitter.com/" target="_blank" rel="noreferrer" className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 transition hover:bg-white/10" aria-label="Twitter" title="Twitter/X">
+    <a href="https://twitter.com/" target="_blank" rel="noreferrer" className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-zinc-200/70 transition hover:bg-zinc-100 dark:border-white/10 dark:hover:bg-white/10" aria-label="Twitter" title="Twitter/X">
               <Twitter className="h-4 w-4" />
             </a>
           </div>
