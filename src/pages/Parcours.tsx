@@ -19,13 +19,7 @@ import {
   Link as LinkIcon,
 } from "lucide-react";
 
-// Props réduites pour mode MPA (thème géré dans l'entrypoint /src/parcours.tsx)
-interface ParcoursProps {
-  glowRef: React.RefObject<HTMLDivElement>;
-  handleMouseMove: (e: React.MouseEvent) => void;
-  accent: string;
-  onNavigateHome?: () => void;
-}
+// Plus de props: le Layout gère le fond, glow, header/footer
 
 interface DevOpsStep {
   id: string;
@@ -168,7 +162,7 @@ const devOpsPath: DevOpsStep[] = [
   },
 ];
 
-export default function Parcours({ glowRef, handleMouseMove, accent, onNavigateHome }: ParcoursProps) {
+export default function Parcours() {
   const [selectedStep, setSelectedStep] = useState<DevOpsStep | null>(null);
   const [copied, setCopied] = useState(false);
 
@@ -325,17 +319,7 @@ export default function Parcours({ glowRef, handleMouseMove, accent, onNavigateH
     </AnimatePresence>, document.body) : null;
 
   return (
-    <div style={{ ["--accent" as string]: accent }} className="relative min-h-screen text-zinc-100 bg-zinc-950" onMouseMove={handleMouseMove}>
-      {/* Décor */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -top-32 left-1/2 h-[60rem] w-[60rem] -translate-x-1/2 rounded-full blur-3xl" style={{ background: "radial-gradient(closest-side, var(--accent) 0%, transparent 60%)", opacity: 0.08 }} />
-        <svg className="absolute inset-0 h-full w-full opacity-[0.05]" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-          <defs><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="currentColor" strokeWidth="0.5" /></pattern></defs>
-          <rect width="100%" height="100%" fill="url(#grid)" />
-        </svg>
-      </div>
-      {/* Glow */}
-      <div ref={glowRef} data-testid="global-glow" aria-hidden className="pointer-events-none fixed z-0 h-[300px] w-[300px] rounded-full opacity-30 blur-2xl" style={{ left: 0, top: 0, background: "radial-gradient(closest-side, var(--accent), transparent 70%)", transform: "translate3d(-150px, -150px, 0)", willChange: 'transform', mixBlendMode: 'screen' }} />
+      // Contenu spécifique; le Layout gère le décor et le glow
       <div className="relative z-10">
         {/* Hero */}
         <section className="relative py-20">
@@ -363,7 +347,7 @@ export default function Parcours({ glowRef, handleMouseMove, accent, onNavigateH
         </section>
         {/* Modal */}
         {modal}
-        {/* CTA */}
+  {/* CTA */}
         <section className="relative py-20">
           <div className="mx-auto max-w-4xl px-4 text-center md:px-6">
             <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="rounded-3xl border border-white/10 bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-pink-500/10 p-12 backdrop-blur">
@@ -371,12 +355,11 @@ export default function Parcours({ glowRef, handleMouseMove, accent, onNavigateH
               <p className="mb-8 opacity-80">Lancez-vous dès maintenant avec le premier module.</p>
               <div className="flex flex-wrap justify-center gap-4">
                 <button onClick={() => setSelectedStep(devOpsPath[0])} className="rounded-xl bg-blue-500 px-8 py-4 font-semibold text-white transition hover:bg-blue-600">Premier module</button>
-                <button onClick={() => { if (onNavigateHome) onNavigateHome(); else window.location.href = "/"; }} className="rounded-xl border border-white/20 bg-white/10 px-8 py-4 font-semibold backdrop-blur transition hover:bg-white/20">Accueil</button>
+    <a href="/" className="rounded-xl border border-white/20 bg-white/10 px-8 py-4 font-semibold backdrop-blur transition hover:bg-white/20">Accueil</a>
               </div>
             </motion.div>
           </div>
         </section>
       </div>
-    </div>
   );
 }

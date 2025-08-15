@@ -5,7 +5,7 @@
     <link rel="icon" href="favicon.ico" sizes="any" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="manifest" href="/site.webmanifest" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>LeChemin.tech - Apprendre DevOps & Cloud en Français (Feuilles de route)</title>
     <meta name="description" content="Apprenez le DevOps, le Cloud, l'infrastructure, la CI/CD, la containerisation et la sécurité en français. Feuilles de route structurées, ressources sélectionnées et guides pratiques pour progresser rapidement." />
@@ -37,8 +37,8 @@
     <!-- Données structurées JSON-LD -->
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"LeChemin.tech","url":"https://lechemin.tech/","inLanguage":"fr","potentialAction":{"@type":"SearchAction","target":"https://lechemin.tech/?q={search_term_string}","query-input":"required name=search_term_string"}}</script>
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"LeChemin.tech","url":"https://lechemin.tech/","logo":"https://lechemin.tech/logo.png","sameAs":["https://www.linkedin.com/company/lechemin","https://twitter.com/lechemin"]}</script>
-    <script type="application/ld+json">{"@context":"https://schema.org","@type":"Course","name":"Parcours DevOps","description":"Roadmap DevOps structurée: Linux, Git, Scripting, Docker, Kubernetes, Cloud, CI/CD, Sécurité & Observabilité.","provider":{"@type":"Organization","name":"LeChemin.tech","sameAs":"https://lechemin.tech/"},"educationalCredentialAwarded":"Compétences pratiques DevOps","inLanguage":"fr"}</script>
-    <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Accueil","item":"https://lechemin.tech/"},{"@type":"ListItem","position":2,"name":"Parcours DevOps","item":"https://lechemin.tech/parcours"}]}</script>
+  <!-- JSON-LD minimal pour le site (les pages dynamiques seront gérées par le routeur) -->
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"LeChemin.tech","url":"https://lechemin.tech/","inLanguage":"fr"}</script>
     <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml" />
   </head>
   <body class="dark">
@@ -47,7 +47,7 @@
         Pour une expérience complète (animations, navigation interactive), activez JavaScript. Vous pouvez néanmoins consulter la structure principale: Roadmap DevOps (Linux, Git, Scripting, Docker, Kubernetes, Cloud, CI/CD, Sécurité) et ressources en français.
       </div>
     </noscript>
-    <div id="root"></div>
-    <script type="module" src="/src/home.tsx"></script>
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
