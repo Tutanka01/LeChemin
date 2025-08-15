@@ -2,6 +2,7 @@
 // Homepage avec navigation vers les parcours
 
 import React from "react";
+import { Helmet } from 'react-helmet-async';
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { motion } from "framer-motion";
@@ -53,27 +54,71 @@ export default function Home() {
   return (
       // Sections spécifiques à la page (le fond + header/footer sont dans Layout)
       <>
+      <Helmet>
+        <title>Roadmap DevOps en Français | Devenir DevOps | LeChemin.tech</title>
+        <meta name="description" content="Roadmap DevOps claire et moderne en français. Linux, Git, Docker, Kubernetes, Cloud, Terraform, CI/CD, Sécurité. Guides et ressources pour devenir DevOps." />
+        <link rel="canonical" href="https://lechemin.tech/" />
+        <meta name="keywords" content="roadmap devops,devenir devops,parcours devops,feuille de route devops,devops français,linux,docker,kubernetes,terraform,ci cd,cloud" />
+        <meta property="og:title" content="Roadmap DevOps en Français | LeChemin.tech" />
+        <meta property="og:description" content="Apprenez DevOps étape par étape: Linux, Git, Docker, Kubernetes, Cloud, Terraform, CI/CD, Sécurité." />
+        <meta property="og:url" content="https://lechemin.tech/" />
+        <script type="application/ld+json">{JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'LearningResource',
+          name: 'Roadmap DevOps',
+          description: "Feuille de route DevOps en français: Linux, Git, Docker, Kubernetes, Cloud, Terraform, CI/CD, Sécurité.",
+          inLanguage: 'fr',
+          url: 'https://lechemin.tech/',
+          about: ['DevOps','Cloud','Kubernetes','Docker','Terraform','CI/CD','Linux']
+        })}</script>
+      </Helmet>
       {/* HERO */}
-      <section className="relative pt-20">
-        <div className="mx-auto max-w-7xl px-4 py-14 md:py-24 md:px-6">
-          <motion.h1
-            data-testid="hero-title"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-balance text-3xl font-black leading-[1.05] tracking-tight sm:text-4xl md:text-6xl"
-          >
-            La boussole moderne pour les métiers tech
-          </motion.h1>
+      <section className="relative pt-14 md:pt-16">
+        <div className="mx-auto max-w-7xl px-4 py-10 md:py-16 md:px-6">
+          {/* Décor animé discret (blobs) */}
+          <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+            <motion.div
+              className="absolute -top-24 -left-10 h-72 w-72 rounded-full opacity-25 blur-3xl"
+              style={{ background: 'radial-gradient(closest-side, var(--accent), transparent 70%)' }}
+              animate={{ x: [0, 15, -10, 0], y: [0, 10, 0, -8] }}
+              transition={{ duration: 18, repeat: Infinity, repeatType: 'mirror', ease: 'easeInOut' }}
+            />
+            <motion.div
+              className="absolute top-28 -right-10 h-80 w-80 rounded-full opacity-20 blur-3xl"
+              style={{ background: 'radial-gradient(closest-side, #7C3AED, transparent 70%)' }}
+              animate={{ x: [0, -10, 12, 0], y: [0, -8, 0, 10] }}
+              transition={{ duration: 20, repeat: Infinity, repeatType: 'mirror', ease: 'easeInOut' }}
+            />
+          </div>
+
+          {/* Titre avec effet typewriter */}
+          <HeroTitle />
 
           <motion.p
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.05, duration: 0.6 }}
-            className="mt-4 max-w-xl text-pretty text-base leading-relaxed text-zinc-300 sm:max-w-2xl md:text-lg"
+            className="mt-4 max-w-xl text-pretty text-base leading-relaxed text-zinc-600 sm:max-w-2xl md:text-lg dark:text-zinc-300"
           >
             Des feuilles de route claires, des ressources sélectionnées et un guidage concret. Commencez dès maintenant par le parcours DevOps.
           </motion.p>
+
+          {/* Chips mots-clés (micro-interactions) */}
+          <div className="mt-5 flex flex-wrap gap-2">
+            {['Linux','Git','Docker','Kubernetes','AWS','Terraform','CI/CD','Sécurité'].map((k) => (
+              <motion.span
+                key={k}
+                whileHover={{ y: -2, scale: 1.03 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 22 }}
+                className="group inline-flex items-center gap-1.5 rounded-full border border-zinc-200/70 bg-white px-3 py-1 text-xs text-zinc-700 shadow-sm transition-colors hover:border-blue-200 hover:bg-blue-50/70 dark:border-white/10 dark:bg-white/5 dark:text-zinc-300 dark:hover:bg-white/10"
+              >
+                <span className="inline-block h-1.5 w-1.5 rounded-full bg-blue-500/70 transition-colors group-hover:bg-blue-600/90" />
+                {k}
+              </motion.span>
+            ))}
+          </div>
+
+          {/* Marquee retirée sur demande */}
 
           <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -83,7 +128,7 @@ export default function Home() {
           >
             <Link
               to="/parcours"
-              className="group inline-flex w-full items-center justify-center gap-2 rounded-2xl px-6 py-3 text-sm font-semibold shadow-lg transition focus:outline-none focus:ring-2 focus:ring-[var(--accent)] sm:w-auto"
+              className="group btn-shine relative inline-flex w-full items-center justify-center gap-2 overflow-hidden rounded-2xl px-6 py-3 text-sm font-semibold shadow-lg transition focus:outline-none focus:ring-2 focus:ring-[var(--accent)] sm:w-auto"
               style={{ background: `linear-gradient(180deg, var(--accent), #1746D1)`, boxShadow: `0 10px 30px ${accent}55`, color: "white" }}
             >
               Commencer le parcours DevOps
@@ -92,14 +137,14 @@ export default function Home() {
 
             <a
               href="#mission"
-              className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-white/15 bg-white/60 px-6 py-3 text-sm font-semibold backdrop-blur transition hover:bg-white/80 dark:bg-zinc-900/60 dark:hover:bg-zinc-900 sm:w-auto"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-zinc-200/70 bg-white px-6 py-3 text-sm font-semibold backdrop-blur transition hover:bg-zinc-50 dark:border-white/15 dark:bg-zinc-900/60 dark:hover:bg-zinc-900 sm:w-auto"
             >
               Notre mission
             </a>
           </motion.div>
 
           {!user && (
-            <div className="mt-3 text-sm text-zinc-400">
+            <div className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">
               <Link
                 to="/auth"
                 className="font-medium text-[var(--accent)] underline-offset-4 hover:underline"
@@ -117,6 +162,9 @@ export default function Home() {
             </div>
           )}
 
+          {/* Séparateur subtil */}
+          <div className="mt-10 h-px bg-gradient-to-r from-transparent via-zinc-200 to-transparent dark:via-white/10" />
+
           {/* Le CTA waitlist est déplacé sous la section Parcours (ci-dessous) */}
         </div>
       </section>
@@ -132,7 +180,7 @@ export default function Home() {
             <p className="-mt-2 mb-6 text-xs opacity-70 sm:text-sm">À venir : Cybersécurité, Frontend, Backend, Data Scientist, IA/ML.</p>
 
           {/* Mobile horizontal scroll */}
-          <div className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4 sm:hidden px-4">
+          <div className="-mx-4 flex gap-4 overflow-x-auto pb-4 sm:hidden px-4 touch-pan-x overscroll-x-contain">
             {paths.map(({ title, desc, icon: Icon }, i) => (
               <motion.div
                 key={title}
@@ -140,10 +188,10 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.2 }}
                 transition={{ duration: 0.4, delay: i * 0.03 }}
-                className="group relative min-w-[240px] snap-start overflow-hidden rounded-3xl border border-white/10 bg-white/70 p-4 text-left shadow-sm transition hover:shadow-xl dark:bg-zinc-900/60"
+                className="group relative min-w-[240px] snap-start overflow-hidden rounded-3xl border border-zinc-200/70 bg-white p-4 text-left shadow-sm transition hover:shadow-xl dark:border-white/10 dark:bg-zinc-900/60"
               >
                 <div className="relative z-10 flex items-start gap-4">
-                  <div className="grid h-10 w-10 place-items-center rounded-2xl bg-white/70 shadow-sm dark:bg-zinc-950/60" style={{ boxShadow: `inset 0 0 0 1px ${accent}22` }}>
+                  <div className="grid h-10 w-10 place-items-center rounded-2xl bg-zinc-50 shadow-sm ring-1 ring-zinc-200/70 dark:bg-zinc-950/60 dark:ring-0" style={{ boxShadow: `inset 0 0 0 1px ${accent}22` }}>
                     <Icon className="h-5 w-5" />
                   </div>
                   <div>
@@ -169,10 +217,10 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.2 }}
                 transition={{ duration: 0.4, delay: i * 0.03 }}
-                className="group relative overflow-hidden rounded-3xl border border-white/10 bg-white/60 p-5 text-left shadow-sm transition hover:shadow-xl dark:bg-zinc-900/60"
+                className="group relative overflow-hidden rounded-3xl border border-zinc-200/70 bg-white p-5 text-left shadow-sm transition hover:shadow-xl dark:border-white/10 dark:bg-zinc-900/60"
               >
                 <div className="relative z-10 flex items-start gap-4">
-                  <div className="grid h-12 w-12 place-items-center rounded-2xl bg-white/70 shadow-sm dark:bg-zinc-950/60" style={{ boxShadow: `inset 0 0 0 1px ${accent}22` }}>
+                  <div className="grid h-12 w-12 place-items-center rounded-2xl bg-zinc-50 shadow-sm ring-1 ring-zinc-200/70 dark:bg-zinc-950/60 dark:ring-0" style={{ boxShadow: `inset 0 0 0 1px ${accent}22` }}>
                     <Icon className="h-6 w-6" />
                   </div>
                   <div>
@@ -208,7 +256,7 @@ export default function Home() {
             <Step n={3} title="Accéder aux ressources" desc="Guides, outils, communautés et opportunités." Icon={ExternalLink} />
           </div>
 
-          <div className="mt-12 rounded-3xl border border-white/10 bg-white/50 p-6 dark:bg-zinc-900/60">
+          <div className="mt-12 rounded-3xl border border-zinc-200/70 bg-white p-6 dark:border-white/10 dark:bg-zinc-900/60">
             <p className="text-pretty text-sm leading-relaxed opacity-90">
               <span className="font-semibold">Notre mission.</span> Rendre l'orientation et l'apprentissage tech simples, accessibles et fiables.
               Nous croyons aux parcours clairs, aux ressources vérifiées, et à l'exigence bienveillante : pour que chacun puisse trouver <em>son</em>
@@ -221,7 +269,7 @@ export default function Home() {
     {/* CONTACT / CTA */}
     <section id="contact" className="relative">
         <div className="mx-auto max-w-7xl px-4 py-10 md:py-16 md:px-6">
-          <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-[var(--accent)] via-[var(--accent)]/70 to-zinc-900 p-8 text-white shadow-xl">
+          <div className="relative overflow-hidden rounded-3xl border border-zinc-200/70 bg-gradient-to-br from-[var(--accent)] via-[var(--accent)]/80 to-zinc-700 p-8 text-white shadow-xl dark:border-white/10 dark:to-zinc-900">
             <div className="relative z-10">
               <h3 className="text-2xl font-bold tracking-tight md:text-3xl">Une question ? Une collaboration ?</h3>
               <p className="mt-2 max-w-2xl text-sm/relaxed opacity-90">
@@ -237,6 +285,69 @@ export default function Home() {
         </div>
       </section>
     </>
+  );
+}
+
+// --- Hero avec mots qui s'écrivent ---
+function HeroTitle() {
+  // Cibles complètes incluant l'article pour participer au typing (en bleu)
+  const targets = React.useMemo(() => ["le DevOps", "le Cloud", "la Cybersécurité"], []);
+  const [idx, setIdx] = React.useState(0);
+  const [text, setText] = React.useState("");
+  const [deleting, setDeleting] = React.useState(false);
+
+  React.useEffect(() => {
+    let timer: number | undefined;
+  const current = targets[idx % targets.length];
+  // Vitesse légèrement ralentie et plus confortable
+  const baseTyping = 100;
+  const baseDeleting = 70;
+  const jitter = 50;
+  const delta = (deleting ? baseDeleting : baseTyping) + Math.random() * jitter;
+
+    if (!deleting && text.length < current.length) {
+      timer = window.setTimeout(() => setText(current.slice(0, text.length + 1)), delta);
+    } else if (!deleting && text.length === current.length) {
+      timer = window.setTimeout(() => setDeleting(true), 1600);
+    } else if (deleting && text.length > 0) {
+      timer = window.setTimeout(() => setText(current.slice(0, text.length - 1)), delta);
+    } else if (deleting && text.length === 0) {
+      setDeleting(false);
+    setIdx((i) => (i + 1) % targets.length);
+    }
+    return () => {
+      if (typeof timer !== 'undefined') {
+        window.clearTimeout(timer);
+      }
+    };
+  }, [text, deleting, idx, targets]);
+
+  return (
+    <motion.h1
+      data-testid="hero-title"
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+      className="text-balance text-3xl font-black leading-[1.05] tracking-tight sm:text-4xl md:text-6xl"
+    >
+      Des parcours clairs pour
+      <span className="block sm:inline"> </span>
+      <span className="relative inline-flex items-baseline">
+  <span className="relative z-10 bg-gradient-to-r from-[var(--accent)] via-[#5A79FF] to-[#7C3AED] bg-clip-text text-transparent animate-[gradshift_6s_ease_infinite]">
+          {text || "\u00A0"}
+          {text.length > 0 && (
+            <span aria-hidden className="pointer-events-none absolute inset-x-0 -bottom-1 h-2 rounded-full bg-gradient-to-r from-blue-500/20 to-purple-500/20 blur-sm" />
+          )}
+        </span>
+        <span className="ml-1 inline-block h-[1em] w-[2px] translate-y-[2px] animate-[caret_1s_steps(2)_infinite] bg-[var(--accent)] align-baseline" aria-hidden />
+      </span>
+    <style>{`
+        @keyframes caret { 50% { opacity: 0; } }
+  .btn-shine::before { content:''; position:absolute; inset:0; transform:translateX(-120%); background:linear-gradient(90deg, transparent, rgba(255,255,255,.35), transparent); transition: transform .7s ease, opacity .2s; opacity:0; }
+  .btn-shine:hover::before { transform:translateX(120%); opacity:1; }
+  @keyframes gradshift { 0% { filter:hue-rotate(0deg); } 50% { filter:hue-rotate(12deg); } 100% { filter:hue-rotate(0deg); } }
+      `}</style>
+    </motion.h1>
   );
 }
 
@@ -262,8 +373,8 @@ function WaitlistCard({ variant }: { variant: 'mobile' | 'desktop' }) {
 
   const isMobile = variant === 'mobile';
   const outerCls = isMobile
-    ? 'group relative min-w-[240px] snap-start overflow-hidden rounded-3xl border border-white/10 bg-white/70 p-4 text-left shadow-sm transition hover:shadow-xl dark:bg-zinc-900/60'
-    : 'group relative overflow-hidden rounded-3xl border border-white/10 bg-white/60 p-5 text-left shadow-sm transition hover:shadow-xl dark:bg-zinc-900/60';
+    ? 'group relative min-w-[240px] snap-start overflow-hidden rounded-3xl border border-zinc-200/70 bg-white p-4 text-left shadow-sm transition hover:shadow-xl dark:border-white/10 dark:bg-zinc-900/60'
+    : 'group relative overflow-hidden rounded-3xl border border-zinc-200/70 bg-white p-5 text-left shadow-sm transition hover:shadow-xl dark:border-white/10 dark:bg-zinc-900/60';
 
   return (
     <motion.div
@@ -274,17 +385,17 @@ function WaitlistCard({ variant }: { variant: 'mobile' | 'desktop' }) {
       className={outerCls}
     >
       <div className="relative z-10 flex items-start gap-4">
-        <div className="grid h-12 w-12 place-items-center rounded-2xl bg-blue-600/15 text-blue-300 ring-1 ring-blue-500/25">
+        <div className="grid h-12 w-12 place-items-center rounded-2xl bg-blue-50 text-blue-600 ring-1 ring-blue-200 dark:bg-blue-600/15 dark:text-blue-300 dark:ring-blue-500/25">
           <Bell className="h-6 w-6" />
         </div>
         <div className="flex-1">
           <div className="flex items-center gap-2">
             <h3 className="text-lg font-semibold tracking-tight">Cybersécurité</h3>
-            <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white/80 ring-1 ring-white/20">Bientôt</span>
+            <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-blue-700 ring-1 ring-blue-200 dark:bg-white/10 dark:text-white/80 dark:ring-white/20">Bientôt</span>
           </div>
           <p className="mt-1 text-sm opacity-80">Recevez une notification à l'ouverture du parcours.</p>
           {!open && status !== 'ok' && (
-            <button type="button" onClick={() => setOpen(true)} className="mt-4 inline-flex items-center gap-2 rounded-xl border border-blue-500/30 bg-blue-600/10 px-3 py-2 text-xs font-semibold text-blue-200 transition hover:bg-blue-600/20">
+            <button type="button" onClick={() => setOpen(true)} className="mt-4 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500/30 dark:border-blue-500/30 dark:bg-blue-600/10 dark:text-blue-200 dark:hover:bg-blue-600/20">
               Prévenez-moi
             </button>
           )}
@@ -302,7 +413,7 @@ function WaitlistCard({ variant }: { variant: 'mobile' | 'desktop' }) {
                 placeholder="votre@email.com"
                 value={email}
                 onChange={e=>setEmail(e.target.value)}
-                className="w-full rounded-xl border border-white/20 bg-white/70 px-3 py-2 text-sm outline-none dark:bg-zinc-950/60"
+                className="w-full rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500/30 dark:border-white/20 dark:bg-zinc-950/60"
               />
               <div className="flex items-center gap-2">
                 <button disabled={status==='loading'} className="inline-flex items-center justify-center rounded-xl bg-blue-600 px-3 py-2 text-xs font-semibold text-white disabled:opacity-60">{status==='loading' ? 'Envoi…' : 'S’inscrire'}</button>

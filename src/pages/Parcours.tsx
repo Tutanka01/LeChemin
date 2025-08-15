@@ -2,6 +2,7 @@
 // Parcours DevOps simplifié et interactif
 
 import React, { useEffect, useMemo, useState } from "react";
+import { Helmet } from 'react-helmet-async';
 import { motion, AnimatePresence } from "framer-motion";
 import { createPortal } from 'react-dom';
 import {
@@ -313,7 +314,7 @@ export default function Parcours() {
         className="relative"
         style={{ willChange: 'transform, opacity' }}
       >
-        {isConnected && (
+  {isConnected && (
           <div className="absolute left-1/2 top-0 h-12 w-0.5 -translate-x-1/2 -translate-y-12 bg-gradient-to-b from-transparent via-zinc-700 to-transparent md:h-16 md:-translate-y-16" />
         )}
   <motion.div
@@ -322,22 +323,25 @@ export default function Parcours() {
           tabIndex={0}
           role="button"
           onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openStep(step); } }}
-          className="group relative cursor-pointer rounded-2xl border border-white/10 bg-zinc-900/60 p-5 backdrop-blur-sm transition-all duration-300 hover:shadow-xl sm:rounded-3xl sm:p-8"
+          className="group relative cursor-pointer rounded-2xl border border-zinc-200/70 bg-white p-5 backdrop-blur-sm transition-all duration-300 hover:shadow-xl dark:border-white/10 dark:bg-zinc-900/60 sm:rounded-3xl sm:p-8"
           style={{ boxShadow: `0 4px 18px ${step.color}10, inset 0 0 0 1px ${step.color}25`, willChange: 'transform' }}
         >
           <div
-            className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-xl shadow-md sm:h-16 sm:w-16 sm:rounded-2xl"
-            style={{ backgroundColor: `${step.color}22`, boxShadow: `0 4px 14px ${step.color}33` }}
+            className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-xl shadow-md ring-1 ring-transparent transition-all duration-300 group-hover:ring-[var(--step-color)] sm:h-16 sm:w-16 sm:rounded-2xl"
+            style={{ backgroundColor: `${step.color}22`, boxShadow: `0 4px 14px ${step.color}33`, ['--step-color' as any]: step.color }}
           >
-            {React.createElement(step.icon, { className: 'h-7 w-7 sm:h-8 sm:w-8', style: { color: step.color } })}
+            {React.createElement(step.icon, { className: 'h-7 w-7 sm:h-8 sm:w-8 drop-shadow-[0_0_8px_var(--step-color)] transition duration-300', style: { color: step.color, filter: 'drop-shadow(0 0 0 rgba(0,0,0,0))' } })}
           </div>
           <div className="space-y-3 sm:space-y-4">
             <div>
-              <h3 className="text-lg font-bold tracking-tight sm:text-xl">{step.title}</h3>
-              <p className="mt-2 text-[13px] leading-relaxed text-zinc-300 sm:text-sm">{step.description}</p>
+              <h3 className="title-underline text-lg font-bold tracking-tight sm:text-xl">
+                {step.title}
+                <span aria-hidden className="block h-[2px] w-0 bg-[var(--step-color)] transition-all duration-300 group-hover:w-16" />
+              </h3>
+              <p className="mt-2 text-[13px] leading-relaxed text-zinc-600 dark:text-zinc-300 sm:text-sm">{step.description}</p>
             </div>
             <div className="flex flex-wrap gap-2">
-              <div className="flex items-center gap-1 rounded-full bg-white/5 px-3 py-1 text-[11px] text-zinc-300 ring-1 ring-white/10 sm:text-xs"><Clock className="h-3 w-3" />{step.duration}</div>
+              <div className="flex items-center gap-1 rounded-full bg-zinc-100 px-3 py-1 text-[11px] text-zinc-700 ring-1 ring-zinc-200/70 dark:bg-white/5 dark:text-zinc-300 dark:ring-white/10 sm:text-xs"><Clock className="h-3 w-3" />{step.duration}</div>
               <div className={`rounded-full px-3 py-1 text-[11px] sm:text-xs ${
                 step.difficulty === 'Débutant' ? 'bg-green-500/15 text-green-400 ring-1 ring-green-500/30' :
                 step.difficulty === 'Intermédiaire' ? 'bg-yellow-500/15 text-yellow-400 ring-1 ring-yellow-500/30' :
@@ -345,20 +349,20 @@ export default function Parcours() {
             </div>
             <div className="flex flex-wrap gap-1">
               {step.skills.slice(0, 3).map(skill => (
-                <span key={skill} className="rounded-md bg-white/5 px-2 py-1 text-[11px] text-zinc-300 ring-1 ring-white/10 sm:text-xs">{skill}</span>
+                <span key={skill} className="rounded-md bg-zinc-100 px-2 py-1 text-[11px] text-zinc-700 ring-1 ring-zinc-200/70 dark:bg-white/5 dark:text-zinc-300 dark:ring-white/10 sm:text-xs">{skill}</span>
               ))}
               {step.skills.length > 3 && (
-                <span className="rounded-md bg-white/5 px-2 py-1 text-[11px] text-zinc-300 ring-1 ring-white/10 sm:text-xs">+{step.skills.length - 3}</span>
+                <span className="rounded-md bg-zinc-100 px-2 py-1 text-[11px] text-zinc-700 ring-1 ring-zinc-200/70 dark:bg-white/5 dark:text-zinc-300 dark:ring-white/10 sm:text-xs">+{step.skills.length - 3}</span>
               )}
             </div>
             <div className="flex items-center gap-2 text-xs font-medium text-zinc-400 sm:text-sm">Explorer ce module <ChevronRight className="h-4 w-4 transition group-hover:translate-x-1" /></div>
             <div className="mt-2">
-              <div className="mb-1 flex items-center justify-between text-xs text-zinc-400">
+              <div className="mb-1 flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400">
                 <span>Progression</span>
                 <span>{pct}%</span>
               </div>
-              <div className="h-2 w-full overflow-hidden rounded-full bg-white/10">
-                <div className="h-full rounded-full bg-blue-500" style={{ width: `${pct}%` }} />
+              <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-200 dark:bg-white/10">
+                <div className="h-full rounded-full bg-blue-600 dark:bg-blue-500" style={{ width: `${pct}%` }} />
               </div>
             </div>
           </div>
@@ -379,7 +383,7 @@ export default function Parcours() {
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}
           transition={{ type: 'spring', stiffness: 320, damping: 30 }}
-          className="mx-4 max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-3xl border border-white/10 bg-zinc-900/95 p-8 shadow-2xl ring-1 ring-white/10"
+          className="mx-4 max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-3xl border border-zinc-200/70 bg-white p-8 shadow-2xl ring-1 ring-zinc-200/70 dark:border-white/10 dark:bg-zinc-900/95 dark:ring-white/10"
           onMouseDown={e => e.stopPropagation()}
         >
           <div className="mb-6 flex items-start justify-between gap-4">
@@ -388,8 +392,8 @@ export default function Parcours() {
                 {React.createElement(selectedStep.icon, { className: 'h-6 w-6', style: { color: selectedStep.color } })}
               </div>
               <div>
-                <h2 className="text-2xl font-bold tracking-tight text-white">{selectedStep.title}</h2>
-                <p className="text-sm text-zinc-400">{selectedStep.duration} • {selectedStep.difficulty}</p>
+                <h2 className="text-2xl font-bold tracking-tight">{selectedStep.title}</h2>
+                <p className="text-sm text-zinc-600 dark:text-zinc-400">{selectedStep.duration} • {selectedStep.difficulty}</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -402,13 +406,13 @@ export default function Parcours() {
               <button onClick={() => setSelectedStep(null)} className="rounded-xl p-2 text-zinc-300 transition hover:bg-white/5 focus:outline-none focus:ring focus:ring-white/10" aria-label="Fermer"><ArrowLeft className="h-5 w-5" /></button>
             </div>
           </div>
-          {copied && <div className="mb-4 rounded-lg bg-green-500/15 px-3 py-2 text-sm text-green-300 ring-1 ring-green-500/30">Lien copié</div>}
-          <div className="space-y-6 text-zinc-300">
+          {copied && <div className="mb-4 rounded-lg bg-green-500/10 px-3 py-2 text-sm text-green-700 ring-1 ring-green-500/20 dark:bg-green-500/15 dark:text-green-300 dark:ring-green-500/30">Lien copié</div>}
+          <div className="space-y-6 text-zinc-700 dark:text-zinc-300">
             <p className="leading-relaxed">{selectedStep.description}</p>
             {!user && (
               <div className="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/5 p-3 text-sm text-zinc-200">
                 <div className="flex items-center gap-2"><Lock className="h-4 w-4" /> Connectez-vous pour suivre votre progression.</div>
-                <button onClick={() => navigate('/auth')} className="rounded-lg bg-blue-600 px-3 py-1 text-xs font-semibold text-white">Se connecter</button>
+                  <button onClick={() => navigate('/auth')} className="rounded-lg bg-blue-600 px-3 py-1 text-xs font-semibold text-white">Se connecter</button>
               </div>
             )}
             {notice && (
@@ -416,14 +420,14 @@ export default function Parcours() {
             )}
             <div>
               <div className="mb-2 flex items-center justify-between">
-                <h3 className="font-semibold text-white">Compétences</h3>
+                <h3 className="font-semibold">Compétences</h3>
                 <div className="text-xs opacity-70">
                   {progress.filter(p=>p.module_id===selectedStep.id && p.type==='skill' && p.completed).length} / {selectedStep.skills.length}
                 </div>
               </div>
               <div className="mb-3 flex gap-2">
-                <button disabled={!user} onClick={() => toggleAll(selectedStep, 'skill', true)} className="rounded-lg border border-white/10 px-3 py-1 text-xs disabled:opacity-50">Tout cocher</button>
-                <button disabled={!user} onClick={() => toggleAll(selectedStep, 'skill', false)} className="rounded-lg border border-white/10 px-3 py-1 text-xs disabled:opacity-50">Tout décocher</button>
+                <button disabled={!user} onClick={() => toggleAll(selectedStep, 'skill', true)} className="rounded-lg border border-zinc-200/70 px-3 py-1 text-xs disabled:opacity-50 dark:border-white/10">Tout cocher</button>
+                <button disabled={!user} onClick={() => toggleAll(selectedStep, 'skill', false)} className="rounded-lg border border-zinc-200/70 px-3 py-1 text-xs disabled:opacity-50 dark:border-white/10">Tout décocher</button>
               </div>
               <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                 {selectedStep.skills.map((skill, i) => {
@@ -436,9 +440,9 @@ export default function Parcours() {
                       key={skill}
                       disabled={!user}
                       onClick={() => toggleItem(selectedStep.id, 'skill', key, !checked)}
-                      className={`flex items-center gap-3 rounded-xl border px-3 py-2 text-sm transition ${checked ? 'border-green-400/30 bg-green-500/10 text-green-200' : 'border-white/10 bg-white/5 text-zinc-200'} disabled:opacity-60`}
+                      className={`flex items-center gap-3 rounded-xl border px-3 py-2 text-sm transition ${checked ? 'border-green-500/30 bg-green-500/10 text-green-700 dark:text-green-200' : 'border-zinc-200/70 bg-white text-zinc-700 dark:border-white/10 dark:bg-white/5 dark:text-zinc-200'} disabled:opacity-60`}
                     >
-                      <span className={`grid h-6 w-6 place-items-center rounded-full border text-[10px] ${checked ? 'border-green-400/50 bg-green-500/30 text-white' : 'border-white/20 bg-white/10 text-white/70'}`}>
+                      <span className={`grid h-6 w-6 place-items-center rounded-full border text-[10px] ${checked ? 'border-green-500/50 bg-green-500/30 text-green-900 dark:text-white' : 'border-zinc-300 bg-zinc-100 text-zinc-700 dark:border-white/20 dark:bg-white/10 dark:text-white/70'}`}>
                         {checked && <Check className="h-4 w-4" />}
                       </span>
                       <span className="flex-1 text-left">{skill}</span>
@@ -449,14 +453,14 @@ export default function Parcours() {
             </div>
             <div>
               <div className="mb-2 flex items-center justify-between">
-                <h3 className="font-semibold text-white">Ressources</h3>
+                <h3 className="font-semibold">Ressources</h3>
                 <div className="text-xs opacity-70">
                   {progress.filter(p=>p.module_id===selectedStep.id && p.type==='resource' && p.completed).length} / {selectedStep.resources.length}
                 </div>
               </div>
               <div className="mb-3 flex gap-2">
-                <button disabled={!user} onClick={() => toggleAll(selectedStep, 'resource', true)} className="rounded-lg border border-white/10 px-3 py-1 text-xs disabled:opacity-50">Tout cocher</button>
-                <button disabled={!user} onClick={() => toggleAll(selectedStep, 'resource', false)} className="rounded-lg border border-white/10 px-3 py-1 text-xs disabled:opacity-50">Tout décocher</button>
+                <button disabled={!user} onClick={() => toggleAll(selectedStep, 'resource', true)} className="rounded-lg border border-zinc-200/70 px-3 py-1 text-xs disabled:opacity-50 dark:border-white/10">Tout cocher</button>
+                <button disabled={!user} onClick={() => toggleAll(selectedStep, 'resource', false)} className="rounded-lg border border-zinc-200/70 px-3 py-1 text-xs disabled:opacity-50 dark:border-white/10">Tout décocher</button>
               </div>
               <div className="space-y-2">
                 {selectedStep.resources.map((r,i)=>{
@@ -464,19 +468,19 @@ export default function Parcours() {
                   const rec = progress.find(p => p.module_id === selectedStep.id && p.type === 'resource' && p.key === key);
                   const checked = Boolean(rec?.completed);
                   return (
-                    <div key={i} className={`flex items-center gap-3 rounded-xl border p-3 text-sm transition ${checked ? 'border-green-400/30 bg-green-500/10 text-green-200' : 'border-white/10 bg-white/5 text-zinc-200'}`}>
+                    <div key={i} className={`flex items-center gap-3 rounded-xl border p-3 text-sm transition ${checked ? 'border-green-500/30 bg-green-500/10 text-green-700 dark:text-green-200' : 'border-zinc-200/70 bg-white text-zinc-700 dark:border-white/10 dark:bg-white/5 dark:text-zinc-200'}`}>
                       <button
                         type="button"
                         disabled={!user}
                         onClick={() => toggleItem(selectedStep.id, 'resource', key, !checked)}
-                        className={`grid h-7 w-7 place-items-center rounded-full border ${checked ? 'border-green-400/50 bg-green-500/30 text-white' : 'border-white/20 bg-white/10 text-white/70'} disabled:opacity-60`}
+                        className={`grid h-7 w-7 place-items-center rounded-full border ${checked ? 'border-green-500/50 bg-green-500/30 text-green-900 dark:text-white' : 'border-zinc-300 bg-zinc-100 text-zinc-700 dark:border-white/20 dark:bg-white/10 dark:text-white/70'} disabled:opacity-60`}
                         aria-label={checked ? 'Marqué comme vu' : 'Marquer comme vu'}
                       >
                         {checked && <Check className="h-4 w-4" />}
                       </button>
                       <a href={r.url} target="_blank" rel="noopener noreferrer" className="flex flex-1 items-center gap-3">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/25"><BookOpen className="h-4 w-4 text-blue-400" /></div>
-                        <div className="flex-1"><div className="font-medium text-white/90">{r.title}</div><div className="text-[11px] uppercase tracking-wide text-blue-300/70">{r.type}</div></div>
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/15 dark:bg-blue-500/25"><BookOpen className="h-4 w-4 text-blue-600 dark:text-blue-400" /></div>
+                        <div className="flex-1"><div className="font-medium text-zinc-900 dark:text-white/90">{r.title}</div><div className="text-[11px] uppercase tracking-wide text-blue-700/70 dark:text-blue-300/70">{r.type}</div></div>
                       </a>
                       <ChevronRight className="h-4 w-4 opacity-60" />
                     </div>
@@ -486,7 +490,7 @@ export default function Parcours() {
             </div>
             <div className="flex flex-col gap-3 pt-4 sm:flex-row">
               <button onClick={() => openFirstResource(selectedStep)} className="flex-1 rounded-xl bg-gradient-to-b from-blue-500 to-blue-600 px-6 py-3 text-sm font-semibold text-white shadow hover:brightness-110 focus:outline-none focus:ring focus:ring-blue-400/40">Commencer</button>
-              {(() => { const idx = devOpsPath.findIndex(s => s.id === selectedStep.id); const next = devOpsPath[idx+1]; return next ? <button onClick={() => openStep(next)} className="rounded-xl border border-white/10 bg-white/5 px-6 py-3 text-sm font-semibold text-zinc-200 backdrop-blur transition hover:bg-white/10 focus:outline-none focus:ring focus:ring-white/10">Suivant</button> : null; })()}
+              {(() => { const idx = devOpsPath.findIndex(s => s.id === selectedStep.id); const next = devOpsPath[idx+1]; return next ? <button onClick={() => openStep(next)} className="rounded-xl border border-zinc-200/70 bg-white px-6 py-3 text-sm font-semibold text-zinc-700 backdrop-blur transition hover:bg-zinc-50 focus:outline-none focus:ring focus:ring-zinc-200 dark:border-white/10 dark:bg-white/5 dark:text-zinc-200 dark:hover:bg-white/10 dark:focus:ring-white/10">Suivant</button> : null; })()}
             </div>
           </div>
         </motion.div>
@@ -496,6 +500,29 @@ export default function Parcours() {
   return (
       // Contenu spécifique; le Layout gère le décor et le glow
       <div className="relative z-10">
+        <Helmet>
+          <title>Parcours DevOps complet | Roadmap pratique | LeChemin.tech</title>
+          <meta name="description" content="Parcours DevOps interactif: Linux, Git, Scripting, Docker, Kubernetes, Cloud, CI/CD, Sécurité. Suivez votre progression et devenez DevOps." />
+          <link rel="canonical" href="https://lechemin.tech/parcours" />
+          <meta property="og:title" content="Parcours DevOps complet" />
+          <meta property="og:description" content="Roadmap DevOps interactive avec modules, ressources et suivi de progression." />
+          <meta property="og:url" content="https://lechemin.tech/parcours" />
+          <script type="application/ld+json">{JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'Course',
+            name: 'Parcours DevOps',
+            description: 'Parcours DevOps interactif en français: Linux, Git, Docker, Kubernetes, Cloud, CI/CD, Sécurité.',
+            inLanguage: 'fr',
+            provider: { '@type': 'Organization', name: 'LeChemin.tech', url: 'https://lechemin.tech/' },
+            hasCourseInstance: devOpsPath.map(step => ({
+              '@type': 'CourseInstance',
+              name: step.title,
+              description: step.description,
+              courseMode: step.difficulty,
+              url: `https://lechemin.tech/parcours#${step.id}`
+            }))
+          })}</script>
+        </Helmet>
         {/* Hero */}
         <section className="relative py-20">
           <div className="mx-auto max-w-7xl px-4 md:px-6">
@@ -515,13 +542,13 @@ export default function Parcours() {
         {/* Global progress */}
         <section className="relative pt-2 pb-6">
           <div className="mx-auto max-w-4xl px-4 md:px-6">
-            <div className="rounded-2xl border border-white/10 bg-white/60 p-4 dark:bg-zinc-900/60">
+            <div className="rounded-2xl border border-zinc-200/70 bg-white p-4 dark:border-white/10 dark:bg-zinc-900/60">
               <div className="mb-1 flex items-center justify-between text-xs">
                 <span className="opacity-70">Progression globale</span>
                 <span className="opacity-90 font-medium">{globalProgress}%</span>
               </div>
-              <div className="h-2 w-full overflow-hidden rounded-full bg-white/10">
-                <div className="h-full rounded-full bg-green-500" style={{ width: `${globalProgress}%` }} />
+              <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-200 dark:bg-white/10">
+                <div className="h-full rounded-full bg-green-600 dark:bg-green-500" style={{ width: `${globalProgress}%` }} />
               </div>
             </div>
           </div>
@@ -539,12 +566,12 @@ export default function Parcours() {
   {/* CTA */}
         <section className="relative py-20">
           <div className="mx-auto max-w-4xl px-4 text-center md:px-6">
-            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="rounded-3xl border border-white/10 bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-pink-500/10 p-12 backdrop-blur">
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="rounded-3xl border border-zinc-200/70 bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-pink-500/10 p-12 backdrop-blur dark:border-white/10">
               <h2 className="mb-4 text-3xl font-bold">Prêt à commencer ?</h2>
-              <p className="mb-8 opacity-80">Lancez-vous dès maintenant avec le premier module.</p>
+              <p className="mb-8 text-zinc-700 opacity-80 dark:text-inherit">Lancez-vous dès maintenant avec le premier module.</p>
               <div className="flex flex-wrap justify-center gap-4">
                 <button onClick={() => setSelectedStep(devOpsPath[0])} className="rounded-xl bg-blue-500 px-8 py-4 font-semibold text-white transition hover:bg-blue-600">Premier module</button>
-    <a href="/" className="rounded-xl border border-white/20 bg-white/10 px-8 py-4 font-semibold backdrop-blur transition hover:bg-white/20">Accueil</a>
+    <a href="/" className="rounded-xl border border-zinc-200/70 bg-white px-8 py-4 font-semibold backdrop-blur transition hover:bg-zinc-50 dark:border-white/20 dark:bg-white/10 dark:hover:bg-white/20">Accueil</a>
               </div>
             </motion.div>
           </div>

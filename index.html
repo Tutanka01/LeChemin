@@ -12,7 +12,7 @@
     <meta name="keywords" content="devops, apprendre devops, cloud, aws, kubernetes, docker, ci cd, cours devops français, roadmap devops, formation devops, linux, git, terraform, sécurité, observabilité" />
     <link rel="canonical" href="https://lechemin.tech/" />
     <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1" />
-    <meta name="theme-color" content="#0052FF" />
+  <meta name="theme-color" content="#ffffff" />
 
     <!-- Open Graph -->
     <meta property="og:site_name" content="LeChemin.tech" />
@@ -40,8 +40,20 @@
   <!-- JSON-LD minimal pour le site (les pages dynamiques seront gérées par le routeur) -->
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"LeChemin.tech","url":"https://lechemin.tech/","inLanguage":"fr"}</script>
     <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml" />
+    <script>
+      (function () {
+        try {
+          var ls = localStorage.getItem('theme');
+          var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var isDark = ls ? ls === 'dark' : prefersDark;
+          document.documentElement.classList.toggle('dark', isDark);
+          var meta = document.querySelector('meta[name="theme-color"]');
+          if (meta) meta.setAttribute('content', isDark ? '#0a0a0b' : '#ffffff');
+        } catch (e) {}
+      })();
+    </script>
   </head>
-  <body class="dark">
+  <body>
     <noscript>
       <div style="padding:1rem;max-width:760px;margin:0 auto;font-family:Inter,system-ui,sans-serif;font-size:14px;">
         Pour une expérience complète (animations, navigation interactive), activez JavaScript. Vous pouvez néanmoins consulter la structure principale: Roadmap DevOps (Linux, Git, Scripting, Docker, Kubernetes, Cloud, CI/CD, Sécurité) et ressources en français.
