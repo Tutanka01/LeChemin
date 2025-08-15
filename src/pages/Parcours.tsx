@@ -1,7 +1,7 @@
 // LeChemin.tech — Page Parcours (MPA)
 // Parcours DevOps simplifié et interactif
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { createPortal } from 'react-dom';
 import {
@@ -18,6 +18,8 @@ import {
   Target,
   Link as LinkIcon,
 } from "lucide-react";
+import { getUserProgress, setProgress, computeModuleProgress, type ProgressRecord } from '../api/progress';
+import { useAuth } from '../context/AuthContext';
 
 // Plus de props: le Layout gère le fond, glow, header/footer
 
@@ -163,8 +165,25 @@ const devOpsPath: DevOpsStep[] = [
 ];
 
 export default function Parcours() {
+  const { user } = useAuth();
   const [selectedStep, setSelectedStep] = useState<DevOpsStep | null>(null);
   const [copied, setCopied] = useState(false);
+  const [progress, setProgressState] = useState<ProgressRecord[]>([]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        if (user) {
+          const data = await getUserProgress();
+          setProgressState(data);
+        } else {
+          setProgressState([]);
+        }
+      } catch (e) {
+        setProgressState([]);
+      } finally { /* noop */ }
+    })();
+  }, [user]);
 
   // Deep-link modal via hash (ouverture initiale)
   useEffect(() => {
@@ -200,8 +219,27 @@ export default function Parcours() {
 
   const openStep = (step: DevOpsStep) => { if (selectedStep?.id !== step.id) setSelectedStep(step); };
 
+  // Helpers progress
+  const moduleProgress = useMemo(() => {
+    const map: Record<string, { done: number, total: number }> = {};
+    for (const step of devOpsPath) {
+      const total = step.skills.length + step.resources.length;
+      const done = progress.filter(p => p.module_id === step.id && p.completed).length;
+      map[step.id] = { done, total };
+    }
+    return map;
+  }, [progress]);
+
+  const globalProgress = useMemo(() => {
+    const total = devOpsPath.reduce((acc, s) => acc + s.skills.length + s.resources.length, 0);
+    const done = progress.filter(p => p.completed).length;
+    return computeModuleProgress(total, done);
+  }, [progress]);
+
   // Step card mémoïsée pour éviter re-rendus lors de l'ouverture du modal
   const StepCard = React.memo(function StepCard({ step, index, isConnected }: { step: DevOpsStep; index: number; isConnected: boolean }) {
+    const mp = moduleProgress[step.id];
+    const pct = computeModuleProgress(mp?.total ?? 0, mp?.done ?? 0);
     return (
       <motion.div
         id={step.id}
@@ -215,7 +253,7 @@ export default function Parcours() {
         {isConnected && (
           <div className="absolute left-1/2 top-0 h-12 w-0.5 -translate-x-1/2 -translate-y-12 bg-gradient-to-b from-transparent via-zinc-700 to-transparent md:h-16 md:-translate-y-16" />
         )}
-        <motion.div
+  <motion.div
           whileHover={{ scale: 1.02, y: -5 }}
           onClick={() => openStep(step)}
           tabIndex={0}
@@ -251,6 +289,15 @@ export default function Parcours() {
               )}
             </div>
             <div className="flex items-center gap-2 text-xs font-medium text-zinc-400 sm:text-sm">Explorer ce module <ChevronRight className="h-4 w-4 transition group-hover:translate-x-1" /></div>
+            <div className="mt-2">
+              <div className="mb-1 flex items-center justify-between text-xs text-zinc-400">
+                <span>Progression</span>
+                <span>{pct}%</span>
+              </div>
+              <div className="h-2 w-full overflow-hidden rounded-full bg-white/10">
+                <div className="h-full rounded-full bg-blue-500" style={{ width: `${pct}%` }} />
+              </div>
+            </div>
           </div>
           <div aria-hidden className="pointer-events-none absolute -bottom-16 left-1/2 hidden h-36 w-36 -translate-x-1/2 rounded-full blur-2xl opacity-0 transition group-hover:opacity-40 sm:block" style={{ background: `radial-gradient(closest-side, ${step.color}, transparent)` }} />
         </motion.div>
@@ -297,17 +344,73 @@ export default function Parcours() {
             <p className="leading-relaxed">{selectedStep.description}</p>
             <div>
               <h3 className="mb-3 font-semibold text-white">Compétences</h3>
-              <div className="flex flex-wrap gap-2">{selectedStep.skills.map(skill => <span key={skill} className="rounded-md bg-white/5 px-3 py-1 text-sm text-zinc-200 ring-1 ring-white/10">{skill}</span>)}</div>
+              <div className="space-y-2">
+                {selectedStep.skills.map(skill => {
+                  const rec = progress.find(p => p.module_id === selectedStep.id && p.type === 'skill' && p.key === skill);
+                  const checked = Boolean(rec?.completed);
+                  return (
+                    <label key={skill} className="flex items-center gap-3 rounded-lg bg-white/5 p-3 text-sm text-zinc-200 ring-1 ring-white/10">
+                      <input
+                        type="checkbox"
+                        className="h-4 w-4 rounded"
+                        checked={checked}
+                        disabled={!user}
+                        onChange={async (e) => {
+                          if (!user) return;
+                          const val = e.target.checked;
+                          await setProgress(selectedStep.id, 'skill', skill, val);
+                          setProgressState(prev => {
+                            const idx = prev.findIndex(p => p.module_id === selectedStep.id && p.type === 'skill' && p.key === skill);
+                            const copy = [...prev];
+                            if (idx >= 0) copy[idx] = { ...copy[idx], completed: val };
+                            else copy.push({ user_id: 'me', module_id: selectedStep.id, type: 'skill', key: skill, completed: val });
+                            return copy;
+                          });
+                        }}
+                      />
+                      <span className="flex-1">{skill}</span>
+                      {!user && <span className="text-xs opacity-60">(connectez-vous)</span>}
+                    </label>
+                  );
+                })}
+              </div>
             </div>
             <div>
               <h3 className="mb-3 font-semibold text-white">Ressources</h3>
-              <div className="space-y-2">{selectedStep.resources.map((r,i)=>(
-                <a key={i} href={r.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 rounded-lg bg-white/5 p-3 text-sm text-zinc-200 transition hover:bg-white/10 focus:outline-none focus:ring focus:ring-white/10">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/25"><BookOpen className="h-4 w-4 text-blue-400" /></div>
-                  <div className="flex-1"><div className="font-medium text-white/90">{r.title}</div><div className="text-[11px] uppercase tracking-wide text-blue-300/70">{r.type}</div></div>
-                  <ChevronRight className="h-4 w-4 text-zinc-500" />
-                </a>
-              ))}</div>
+              <div className="space-y-2">
+                {selectedStep.resources.map((r,i)=>{
+                  const rec = progress.find(p => p.module_id === selectedStep.id && p.type === 'resource' && p.key === r.url);
+                  const checked = Boolean(rec?.completed);
+                  return (
+                    <div key={i} className="flex items-center gap-3 rounded-lg bg-white/5 p-3 text-sm text-zinc-200 ring-1 ring-white/10">
+                      <input
+                        type="checkbox"
+                        className="h-4 w-4 rounded"
+                        checked={checked}
+                        disabled={!user}
+                        onChange={async (e) => {
+                          if (!user) return;
+                          const val = e.target.checked;
+                          await setProgress(selectedStep.id, 'resource', r.url, val);
+                          setProgressState(prev => {
+                            const idx = prev.findIndex(p => p.module_id === selectedStep.id && p.type === 'resource' && p.key === r.url);
+                            const copy = [...prev];
+                            if (idx >= 0) copy[idx] = { ...copy[idx], completed: val };
+                            else copy.push({ user_id: 'me', module_id: selectedStep.id, type: 'resource', key: r.url, completed: val });
+                            return copy;
+                          });
+                        }}
+                      />
+                      <a href={r.url} target="_blank" rel="noopener noreferrer" className="flex flex-1 items-center gap-3">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/25"><BookOpen className="h-4 w-4 text-blue-400" /></div>
+                        <div className="flex-1"><div className="font-medium text-white/90">{r.title}</div><div className="text-[11px] uppercase tracking-wide text-blue-300/70">{r.type}</div></div>
+                      </a>
+                      <ChevronRight className="h-4 w-4 text-zinc-500" />
+                      {!user && <span className="text-xs opacity-60">(connectez-vous)</span>}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
             <div className="flex flex-col gap-3 pt-4 sm:flex-row">
               <button onClick={() => openFirstResource(selectedStep)} className="flex-1 rounded-xl bg-gradient-to-b from-blue-500 to-blue-600 px-6 py-3 text-sm font-semibold text-white shadow hover:brightness-110 focus:outline-none focus:ring focus:ring-blue-400/40">Commencer</button>
@@ -335,6 +438,20 @@ export default function Parcours() {
                 <div className="rounded-full bg-white/10 px-5 py-3 text-sm backdrop-blur dark:bg-white/5">Ressources ouvertes</div>
               </div>
             </motion.div>
+          </div>
+        </section>
+        {/* Global progress */}
+        <section className="relative pt-2 pb-6">
+          <div className="mx-auto max-w-4xl px-4 md:px-6">
+            <div className="rounded-2xl border border-white/10 bg-white/60 p-4 dark:bg-zinc-900/60">
+              <div className="mb-1 flex items-center justify-between text-xs">
+                <span className="opacity-70">Progression globale</span>
+                <span className="opacity-90 font-medium">{globalProgress}%</span>
+              </div>
+              <div className="h-2 w-full overflow-hidden rounded-full bg-white/10">
+                <div className="h-full rounded-full bg-green-500" style={{ width: `${globalProgress}%` }} />
+              </div>
+            </div>
           </div>
         </section>
         {/* Liste */}

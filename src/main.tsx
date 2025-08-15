@@ -4,18 +4,23 @@ import './index.css';
 import Layout from './shared/Layout.tsx';
 import Home from './pages/Home';
 import Parcours from './pages/Parcours';
+import { AuthProvider } from './context/AuthContext';
+import AuthPage from './pages/auth/Auth';
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route element={<Layout />}>
-          <Route path="/" element={<Home />} />
-          <Route path="/parcours" element={<Parcours />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route element={<Layout />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/auth" element={<AuthPage />} />
+            <Route path="/parcours" element={<Parcours />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 

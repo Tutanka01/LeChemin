@@ -1,6 +1,7 @@
 import React from 'react';
-import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
+import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, Moon, Sun, Linkedin, Twitter } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 export default function Layout() {
   const [isDark, setIsDark] = React.useState(true);
@@ -8,6 +9,8 @@ export default function Layout() {
   const glowRef = React.useRef<HTMLDivElement | null>(null);
   const accent = '#0052FF';
   const { pathname } = useLocation();
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
 
   React.useEffect(() => {
     document.documentElement.classList.toggle('dark', isDark);
@@ -49,6 +52,14 @@ export default function Layout() {
             <NavLink to="/" className={activeClass} end>Accueil</NavLink>
             <NavLink to="/parcours" className={activeClass}>Parcours</NavLink>
             <a href="#contact" className="nav-link">Contact</a>
+            {!user ? (
+              <button onClick={() => navigate('/auth')} className="nav-link">Connexion</button>
+            ) : (
+              <div className="flex items-center gap-2">
+                <span className="text-xs opacity-80">{user.email}</span>
+                <button onClick={() => signOut()} className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/60 px-3 py-1 text-xs transition hover:bg-white/80 dark:bg-zinc-900/60 dark:hover:bg-zinc-900">Déconnexion</button>
+              </div>
+            )}
             <button onClick={() => setIsDark(v => !v)} aria-label="Basculer le thème" title="Basculer le thème" className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/60 transition hover:bg-white/80 dark:bg-zinc-900/60 dark:hover:bg-zinc-900">
               {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </button>
@@ -68,6 +79,11 @@ export default function Layout() {
               <NavLink to="/" className="block py-2 text-base font-medium" onClick={() => setOpen(false)} end>Accueil</NavLink>
               <NavLink to="/parcours" className="block py-2 text-base font-medium" onClick={() => setOpen(false)}>Parcours</NavLink>
               <a href="#contact" className="block py-2 text-base font-medium" onClick={() => setOpen(false)}>Contact</a>
+              {!user ? (
+                <button onClick={() => { setOpen(false); navigate('/auth'); }} className="mt-2 w-full rounded-xl border border-white/10 bg-white/60 px-4 py-2 text-sm font-semibold transition hover:bg-white/80 dark:bg-zinc-900/60 dark:hover:bg-zinc-900">Connexion</button>
+              ) : (
+                <button onClick={() => { setOpen(false); signOut(); }} className="mt-2 w-full rounded-xl border border-white/10 bg-white/60 px-4 py-2 text-sm font-semibold transition hover:bg-white/80 dark:bg-zinc-900/60 dark:hover:bg-zinc-900">Déconnexion</button>
+              )}
             </div>
           </div>
         </div>
