@@ -1,16 +1,29 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { isSupabaseConfigured } from '../../lib/supabase';
 
 export default function AuthPage() {
   const { signIn, signUp, signInWithGithub, signInWithGoogle } = useAuth() as any;
   const navigate = useNavigate();
+  const location = useLocation();
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [info, setInfo] = useState<string | null>(null);
+
+  // Si on arrive ici avec un état de redirection après inscription, afficher le message et forcer le mode login
+  useEffect(() => {
+    const st = location.state as any;
+    if (st?.registered) {
+      setMode('login');
+      setInfo("Un email de confirmation vous a été envoyé. Veuillez vérifier votre boîte de réception pour activer votre compte.");
+      // Nettoyer l'état d'historique pour éviter de réafficher le message en revenant en arrière
+      navigate(location.pathname, { replace: true });
+    }
+  }, [location.state, location.pathname, navigate]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -21,14 +34,27 @@ export default function AuthPage() {
     setLoading(false);
     if (error) setError(error);
     else {
-      // Attendre que la session se mette à jour côté client
-      setTimeout(() => navigate('/parcours'), 50);
+      if (mode === 'login') {
+        // Attendre que la session se mette à jour côté client
+        setTimeout(() => navigate('/parcours'), 50);
+      } else {
+        // Après inscription: informer et rediriger vers la page de login
+        setEmail('');
+        setPassword('');
+        setMode('login');
+        navigate('/auth', { replace: true, state: { registered: true } });
+      }
     }
   }
 
   return (
     <div className="mx-auto max-w-md px-4 py-16">
       <div className="rounded-2xl border border-zinc-200/70 bg-white p-6 backdrop-blur dark:border-white/10 dark:bg-zinc-900/60">
+        {info && (
+          <div className="mb-4 rounded-lg bg-blue-500/15 px-3 py-2 text-sm text-blue-300 ring-1 ring-blue-500/30">
+            {info}
+          </div>
+        )}
         {!isSupabaseConfigured() && (
           <div className="mb-4 rounded-lg bg-yellow-500/15 px-3 py-2 text-sm text-yellow-300 ring-1 ring-yellow-500/30">
             Supabase n'est pas configuré. Renseignez VITE_SUPABASE_URL et VITE_SUPABASE_ANON_KEY dans .env.local puis relancez le serveur.
@@ -46,7 +72,7 @@ export default function AuthPage() {
             <input type="password" required value={password} onChange={e=>setPassword(e.target.value)} className="w-full rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500/30 dark:border-white/20 dark:bg-zinc-950/70" />
           </div>
           {error && <div className="rounded-lg bg-red-500/15 px-3 py-2 text-sm text-red-300 ring-1 ring-red-500/30">{error}</div>}
-          <button disabled={loading} className="w-full rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60">{loading ? 'Traitement…' : (mode === 'login' ? 'Se connecter' : 'Créer un compte')}</button>
+          <button disabled={loading} className="w-full rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60">{loading ? 'Traitement…' : (mode === 'login' ? 'Se connecter' : "S'enregistrer")}</button>
         </form>
         <div className="my-4 flex items-center gap-3 opacity-60">
           <div className="h-px flex-1 bg-current" />
