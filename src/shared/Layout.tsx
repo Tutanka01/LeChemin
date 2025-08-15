@@ -69,7 +69,7 @@ export default function Layout() {
   return (
     <div
       style={{ ["--accent" as any]: accent } as React.CSSProperties}
-      className="relative min-h-screen overflow-x-hidden bg-zinc-50 text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-100"
+  className="relative flex min-h-screen flex-col overflow-x-hidden bg-zinc-50 text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-100"
       onMouseMove={onMouseMove}
     >
       {/* Mesh global léger (atténué en dark) */}
@@ -153,7 +153,7 @@ export default function Layout() {
         </div>
       </header>
 
-      <main className="relative z-10">
+  <main className="relative z-10 flex-1">
         <Outlet />
       </main>
 

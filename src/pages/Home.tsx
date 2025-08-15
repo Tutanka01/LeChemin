@@ -2,6 +2,7 @@
 // Homepage avec navigation vers les parcours
 
 import React from "react";
+import { Helmet } from 'react-helmet-async';
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { motion } from "framer-motion";
@@ -53,6 +54,24 @@ export default function Home() {
   return (
       // Sections spécifiques à la page (le fond + header/footer sont dans Layout)
       <>
+      <Helmet>
+        <title>Roadmap DevOps en Français | Devenir DevOps | LeChemin.tech</title>
+        <meta name="description" content="Roadmap DevOps claire et moderne en français. Linux, Git, Docker, Kubernetes, Cloud, Terraform, CI/CD, Sécurité. Guides et ressources pour devenir DevOps." />
+        <link rel="canonical" href="https://lechemin.tech/" />
+        <meta name="keywords" content="roadmap devops,devenir devops,parcours devops,feuille de route devops,devops français,linux,docker,kubernetes,terraform,ci cd,cloud" />
+        <meta property="og:title" content="Roadmap DevOps en Français | LeChemin.tech" />
+        <meta property="og:description" content="Apprenez DevOps étape par étape: Linux, Git, Docker, Kubernetes, Cloud, Terraform, CI/CD, Sécurité." />
+        <meta property="og:url" content="https://lechemin.tech/" />
+        <script type="application/ld+json">{JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'LearningResource',
+          name: 'Roadmap DevOps',
+          description: "Feuille de route DevOps en français: Linux, Git, Docker, Kubernetes, Cloud, Terraform, CI/CD, Sécurité.",
+          inLanguage: 'fr',
+          url: 'https://lechemin.tech/',
+          about: ['DevOps','Cloud','Kubernetes','Docker','Terraform','CI/CD','Linux']
+        })}</script>
+      </Helmet>
       {/* HERO */}
       <section className="relative pt-14 md:pt-16">
         <div className="mx-auto max-w-7xl px-4 py-10 md:py-16 md:px-6">

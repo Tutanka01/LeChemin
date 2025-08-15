@@ -2,6 +2,7 @@
 // Parcours DevOps simplifié et interactif
 
 import React, { useEffect, useMemo, useState } from "react";
+import { Helmet } from 'react-helmet-async';
 import { motion, AnimatePresence } from "framer-motion";
 import { createPortal } from 'react-dom';
 import {
@@ -499,6 +500,29 @@ export default function Parcours() {
   return (
       // Contenu spécifique; le Layout gère le décor et le glow
       <div className="relative z-10">
+        <Helmet>
+          <title>Parcours DevOps complet | Roadmap pratique | LeChemin.tech</title>
+          <meta name="description" content="Parcours DevOps interactif: Linux, Git, Scripting, Docker, Kubernetes, Cloud, CI/CD, Sécurité. Suivez votre progression et devenez DevOps." />
+          <link rel="canonical" href="https://lechemin.tech/parcours" />
+          <meta property="og:title" content="Parcours DevOps complet" />
+          <meta property="og:description" content="Roadmap DevOps interactive avec modules, ressources et suivi de progression." />
+          <meta property="og:url" content="https://lechemin.tech/parcours" />
+          <script type="application/ld+json">{JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'Course',
+            name: 'Parcours DevOps',
+            description: 'Parcours DevOps interactif en français: Linux, Git, Docker, Kubernetes, Cloud, CI/CD, Sécurité.',
+            inLanguage: 'fr',
+            provider: { '@type': 'Organization', name: 'LeChemin.tech', url: 'https://lechemin.tech/' },
+            hasCourseInstance: devOpsPath.map(step => ({
+              '@type': 'CourseInstance',
+              name: step.title,
+              description: step.description,
+              courseMode: step.difficulty,
+              url: `https://lechemin.tech/parcours#${step.id}`
+            }))
+          })}</script>
+        </Helmet>
         {/* Hero */}
         <section className="relative py-20">
           <div className="mx-auto max-w-7xl px-4 md:px-6">

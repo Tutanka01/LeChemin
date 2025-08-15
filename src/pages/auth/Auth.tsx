@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { isSupabaseConfigured } from '../../lib/supabase';
@@ -50,6 +51,11 @@ export default function AuthPage() {
   return (
     <div className="mx-auto max-w-md px-4 py-16">
       <div className="rounded-2xl border border-zinc-200/70 bg-white p-6 backdrop-blur dark:border-white/10 dark:bg-zinc-900/60">
+        <Helmet>
+          <title>{mode === 'login' ? 'Connexion' : 'Créer un compte'} | LeChemin.tech</title>
+          <meta name="robots" content="noindex,nofollow" />
+          <link rel="canonical" href="https://lechemin.tech/auth" />
+        </Helmet>
         {info && (
           <div className="mb-4 rounded-lg bg-blue-500/15 px-3 py-2 text-sm text-blue-300 ring-1 ring-blue-500/30">
             {info}
