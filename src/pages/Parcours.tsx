@@ -17,9 +17,12 @@ import {
   Star,
   Target,
   Link as LinkIcon,
+  Check,
+  Lock,
 } from "lucide-react";
 import { getUserProgress, setProgress, computeModuleProgress, type ProgressRecord } from '../api/progress';
 import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 // Plus de props: le Layout gère le fond, glow, header/footer
 
@@ -166,9 +169,11 @@ const devOpsPath: DevOpsStep[] = [
 
 export default function Parcours() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [selectedStep, setSelectedStep] = useState<DevOpsStep | null>(null);
   const [copied, setCopied] = useState(false);
   const [progress, setProgressState] = useState<ProgressRecord[]>([]);
+  const [notice, setNotice] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -218,6 +223,49 @@ export default function Parcours() {
   };
 
   const openStep = (step: DevOpsStep) => { if (selectedStep?.id !== step.id) setSelectedStep(step); };
+
+  // Local progress updater (optimistic)
+  function updateLocal(moduleId: string, type: 'skill'|'resource', key: string, completed: boolean) {
+    setProgressState(prev => {
+      const idx = prev.findIndex(p => p.module_id === moduleId && p.type === type && p.key === key);
+      const copy = [...prev];
+      if (idx >= 0) copy[idx] = { ...copy[idx], completed };
+      else copy.push({ user_id: user?.id ?? 'anonymous', module_id: moduleId, type, key, completed });
+      return copy;
+    });
+  }
+
+  async function toggleItem(moduleId: string, type: 'skill'|'resource', key: string, next: boolean) {
+    if (!user) return;
+    const prevVal = progress.find(p => p.module_id === moduleId && p.type === type && p.key === key)?.completed ?? false;
+    updateLocal(moduleId, type, key, next);
+    try {
+      await setProgress(moduleId, type, key, next);
+    } catch (e) {
+      // revert
+      updateLocal(moduleId, type, key, prevVal);
+      setNotice("Une erreur est survenue. Réessayez.");
+      setTimeout(() => setNotice(null), 2000);
+    }
+  }
+
+  async function toggleAll(step: DevOpsStep, type: 'skill'|'resource', value: boolean) {
+    if (!user) return;
+    const items = type === 'skill' ? step.skills : step.resources.map(r => r.url);
+    // Optimistic batch
+    items.forEach(k => updateLocal(step.id, type, k, value));
+    try {
+      for (const k of items) {
+        // simple sequential to stay light (could be Promise.all)
+        await setProgress(step.id, type, k, value);
+      }
+    } catch (e) {
+      // revert all
+      items.forEach(k => updateLocal(step.id, type, k, !value));
+      setNotice("Impossible d'appliquer à tous. Réessayez.");
+      setTimeout(() => setNotice(null), 2000);
+    }
+  }
 
   // Helpers progress
   const moduleProgress = useMemo(() => {
@@ -342,71 +390,78 @@ export default function Parcours() {
           {copied && <div className="mb-4 rounded-lg bg-green-500/15 px-3 py-2 text-sm text-green-300 ring-1 ring-green-500/30">Lien copié</div>}
           <div className="space-y-6 text-zinc-300">
             <p className="leading-relaxed">{selectedStep.description}</p>
+            {!user && (
+              <div className="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/5 p-3 text-sm text-zinc-200">
+                <div className="flex items-center gap-2"><Lock className="h-4 w-4" /> Connectez-vous pour suivre votre progression.</div>
+                <button onClick={() => navigate('/auth')} className="rounded-lg bg-blue-600 px-3 py-1 text-xs font-semibold text-white">Se connecter</button>
+              </div>
+            )}
+            {notice && (
+              <div className="rounded-lg bg-yellow-500/15 px-3 py-2 text-sm text-yellow-300 ring-1 ring-yellow-500/30">{notice}</div>
+            )}
             <div>
-              <h3 className="mb-3 font-semibold text-white">Compétences</h3>
-              <div className="space-y-2">
+              <div className="mb-2 flex items-center justify-between">
+                <h3 className="font-semibold text-white">Compétences</h3>
+                <div className="text-xs opacity-70">
+                  {progress.filter(p=>p.module_id===selectedStep.id && p.type==='skill' && p.completed).length} / {selectedStep.skills.length}
+                </div>
+              </div>
+              <div className="mb-3 flex gap-2">
+                <button disabled={!user} onClick={() => toggleAll(selectedStep, 'skill', true)} className="rounded-lg border border-white/10 px-3 py-1 text-xs disabled:opacity-50">Tout cocher</button>
+                <button disabled={!user} onClick={() => toggleAll(selectedStep, 'skill', false)} className="rounded-lg border border-white/10 px-3 py-1 text-xs disabled:opacity-50">Tout décocher</button>
+              </div>
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                 {selectedStep.skills.map(skill => {
                   const rec = progress.find(p => p.module_id === selectedStep.id && p.type === 'skill' && p.key === skill);
                   const checked = Boolean(rec?.completed);
                   return (
-                    <label key={skill} className="flex items-center gap-3 rounded-lg bg-white/5 p-3 text-sm text-zinc-200 ring-1 ring-white/10">
-                      <input
-                        type="checkbox"
-                        className="h-4 w-4 rounded"
-                        checked={checked}
-                        disabled={!user}
-                        onChange={async (e) => {
-                          if (!user) return;
-                          const val = e.target.checked;
-                          await setProgress(selectedStep.id, 'skill', skill, val);
-                          setProgressState(prev => {
-                            const idx = prev.findIndex(p => p.module_id === selectedStep.id && p.type === 'skill' && p.key === skill);
-                            const copy = [...prev];
-                            if (idx >= 0) copy[idx] = { ...copy[idx], completed: val };
-                            else copy.push({ user_id: 'me', module_id: selectedStep.id, type: 'skill', key: skill, completed: val });
-                            return copy;
-                          });
-                        }}
-                      />
-                      <span className="flex-1">{skill}</span>
-                      {!user && <span className="text-xs opacity-60">(connectez-vous)</span>}
-                    </label>
+                    <button
+                      type="button"
+                      key={skill}
+                      disabled={!user}
+                      onClick={() => toggleItem(selectedStep.id, 'skill', skill, !checked)}
+                      className={`flex items-center gap-3 rounded-xl border px-3 py-2 text-sm transition ${checked ? 'border-green-400/30 bg-green-500/10 text-green-200' : 'border-white/10 bg-white/5 text-zinc-200'} disabled:opacity-60`}
+                    >
+                      <span className={`grid h-6 w-6 place-items-center rounded-full border text-[10px] ${checked ? 'border-green-400/50 bg-green-500/30 text-white' : 'border-white/20 bg-white/10 text-white/70'}`}>
+                        {checked && <Check className="h-4 w-4" />}
+                      </span>
+                      <span className="flex-1 text-left">{skill}</span>
+                    </button>
                   );
                 })}
               </div>
             </div>
             <div>
-              <h3 className="mb-3 font-semibold text-white">Ressources</h3>
+              <div className="mb-2 flex items-center justify-between">
+                <h3 className="font-semibold text-white">Ressources</h3>
+                <div className="text-xs opacity-70">
+                  {progress.filter(p=>p.module_id===selectedStep.id && p.type==='resource' && p.completed).length} / {selectedStep.resources.length}
+                </div>
+              </div>
+              <div className="mb-3 flex gap-2">
+                <button disabled={!user} onClick={() => toggleAll(selectedStep, 'resource', true)} className="rounded-lg border border-white/10 px-3 py-1 text-xs disabled:opacity-50">Tout cocher</button>
+                <button disabled={!user} onClick={() => toggleAll(selectedStep, 'resource', false)} className="rounded-lg border border-white/10 px-3 py-1 text-xs disabled:opacity-50">Tout décocher</button>
+              </div>
               <div className="space-y-2">
                 {selectedStep.resources.map((r,i)=>{
                   const rec = progress.find(p => p.module_id === selectedStep.id && p.type === 'resource' && p.key === r.url);
                   const checked = Boolean(rec?.completed);
                   return (
-                    <div key={i} className="flex items-center gap-3 rounded-lg bg-white/5 p-3 text-sm text-zinc-200 ring-1 ring-white/10">
-                      <input
-                        type="checkbox"
-                        className="h-4 w-4 rounded"
-                        checked={checked}
+                    <div key={i} className={`flex items-center gap-3 rounded-xl border p-3 text-sm transition ${checked ? 'border-green-400/30 bg-green-500/10 text-green-200' : 'border-white/10 bg-white/5 text-zinc-200'}`}>
+                      <button
+                        type="button"
                         disabled={!user}
-                        onChange={async (e) => {
-                          if (!user) return;
-                          const val = e.target.checked;
-                          await setProgress(selectedStep.id, 'resource', r.url, val);
-                          setProgressState(prev => {
-                            const idx = prev.findIndex(p => p.module_id === selectedStep.id && p.type === 'resource' && p.key === r.url);
-                            const copy = [...prev];
-                            if (idx >= 0) copy[idx] = { ...copy[idx], completed: val };
-                            else copy.push({ user_id: 'me', module_id: selectedStep.id, type: 'resource', key: r.url, completed: val });
-                            return copy;
-                          });
-                        }}
-                      />
+                        onClick={() => toggleItem(selectedStep.id, 'resource', r.url, !checked)}
+                        className={`grid h-7 w-7 place-items-center rounded-full border ${checked ? 'border-green-400/50 bg-green-500/30 text-white' : 'border-white/20 bg-white/10 text-white/70'} disabled:opacity-60`}
+                        aria-label={checked ? 'Marqué comme vu' : 'Marquer comme vu'}
+                      >
+                        {checked && <Check className="h-4 w-4" />}
+                      </button>
                       <a href={r.url} target="_blank" rel="noopener noreferrer" className="flex flex-1 items-center gap-3">
                         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/25"><BookOpen className="h-4 w-4 text-blue-400" /></div>
                         <div className="flex-1"><div className="font-medium text-white/90">{r.title}</div><div className="text-[11px] uppercase tracking-wide text-blue-300/70">{r.type}</div></div>
                       </a>
-                      <ChevronRight className="h-4 w-4 text-zinc-500" />
-                      {!user && <span className="text-xs opacity-60">(connectez-vous)</span>}
+                      <ChevronRight className="h-4 w-4 opacity-60" />
                     </div>
                   );
                 })}

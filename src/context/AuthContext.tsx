@@ -8,6 +8,7 @@ interface AuthContextValue {
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error?: string }>
   signUp: (email: string, password: string) => Promise<{ error?: string }>
+  signInWithGithub: () => Promise<{ error?: string }>
   signOut: () => Promise<void>
 }
 
@@ -47,6 +48,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     },
     async signUp(email, password) {
       const { error } = await supabase.auth.signUp({ email, password });
+      if (error) return { error: error.message };
+      return {};
+    },
+    async signInWithGithub() {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'github',
+        options: {
+          redirectTo: typeof window !== 'undefined' ? `${window.location.origin}/parcours` : undefined,
+        }
+      });
       if (error) return { error: error.message };
       return {};
     },

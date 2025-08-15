@@ -3,10 +3,12 @@
 
 import React from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import { motion } from "framer-motion";
 import { ServerCog, ChevronRight, Compass, BookOpenCheck, ExternalLink } from "lucide-react";
 
 export default function Home() {
+  const { user } = useAuth();
   const accent = '#0052FF';
   const paths = [
     {
@@ -94,6 +96,25 @@ export default function Home() {
               Notre mission
             </a>
           </motion.div>
+
+          {!user && (
+            <div className="mt-3 text-sm text-zinc-400">
+              <Link
+                to="/auth"
+                className="font-medium text-[var(--accent)] underline-offset-4 hover:underline"
+              >
+                Créer un compte gratuit
+              </Link>
+              <span className="mx-1">·</span>
+              <Link
+                to="/auth"
+                className="hover:underline underline-offset-4"
+              >
+                Se connecter
+              </Link>
+              <span className="ml-2 opacity-75">pour sauvegarder vos progrès</span>
+            </div>
+          )}
         </div>
       </section>
 
