@@ -69,7 +69,13 @@ export default function Layout() {
             <NavLink to="/parcours" className={activeClass}>Parcours</NavLink>
             <a href="#contact" className="nav-link">Contact</a>
             {!user ? (
-              <button onClick={() => navigate('/auth')} className="nav-link">Connexion</button>
+              <button
+                onClick={() => navigate('/auth')}
+                className="inline-flex items-center justify-center rounded-xl border border-blue-500/30 bg-blue-600/10 px-3 py-1.5 text-xs font-semibold text-blue-200 transition hover:bg-blue-600/20"
+                style={{ boxShadow: 'inset 0 0 0 1px rgba(0,82,255,.25)' }}
+              >
+                Connexion
+              </button>
             ) : (
               <div className="flex items-center gap-2">
                 <span className="text-xs opacity-80">{user.email}</span>
@@ -105,7 +111,7 @@ export default function Layout() {
               <NavLink to="/parcours" className="block py-2 text-base font-medium" onClick={() => setOpen(false)}>Parcours</NavLink>
               <a href="#contact" className="block py-2 text-base font-medium" onClick={() => setOpen(false)}>Contact</a>
               {!user ? (
-                <button onClick={() => { setOpen(false); navigate('/auth'); }} className="mt-2 w-full rounded-xl border border-white/10 bg-white/60 px-4 py-2 text-sm font-semibold transition hover:bg-white/80 dark:bg-zinc-900/60 dark:hover:bg-zinc-900">Connexion</button>
+                <button onClick={() => { setOpen(false); navigate('/auth'); }} className="mt-2 w-full rounded-xl border border-blue-500/30 bg-blue-600/10 px-4 py-2 text-sm font-semibold text-blue-200 transition hover:bg-blue-600/20">Connexion</button>
               ) : (
                 <button onClick={() => { setOpen(false); signOut(); }} className="mt-2 w-full rounded-xl border border-white/10 bg-white/60 px-4 py-2 text-sm font-semibold transition hover:bg-white/80 dark:bg-zinc-900/60 dark:hover:bg-zinc-900">Déconnexion</button>
               )}

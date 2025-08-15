@@ -5,7 +5,8 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { motion } from "framer-motion";
-import { ServerCog, ChevronRight, Compass, BookOpenCheck, ExternalLink } from "lucide-react";
+import { ServerCog, ChevronRight, Compass, BookOpenCheck, ExternalLink, Bell } from "lucide-react";
+import { addToWaitlist } from '../api/waitlist';
 
 export default function Home() {
   const { user } = useAuth();
@@ -115,6 +116,8 @@ export default function Home() {
               <span className="ml-2 opacity-75">pour sauvegarder vos progrès</span>
             </div>
           )}
+
+          {/* Le CTA waitlist est déplacé sous la section Parcours (ci-dessous) */}
         </div>
       </section>
 
@@ -153,6 +156,8 @@ export default function Home() {
                 </Link>
               </motion.div>
             ))}
+            {/* Carte waitlist (mobile) */}
+            <WaitlistCard variant="mobile" />
           </div>
 
           {/* Desktop / tablet grid */}
@@ -180,6 +185,8 @@ export default function Home() {
                 </Link>
               </motion.div>
             ))}
+            {/* Carte waitlist (desktop/tablette) */}
+            <WaitlistCard variant="desktop" />
           </div>
         </div>
       </section>
@@ -230,5 +237,83 @@ export default function Home() {
         </div>
       </section>
     </>
+  );
+}
+
+// --- Components ---
+function WaitlistCard({ variant }: { variant: 'mobile' | 'desktop' }) {
+  const [open, setOpen] = React.useState(false);
+  const [email, setEmail] = React.useState('');
+  const [status, setStatus] = React.useState<'idle'|'loading'|'ok'|'error'>('idle');
+  const [hp, setHp] = React.useState(''); // honeypot
+
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (hp) return;
+    setStatus('loading');
+    try {
+      await addToWaitlist(email, 'cyber');
+      setStatus('ok');
+      setEmail('');
+    } catch (err: any) {
+      setStatus('error');
+    }
+  };
+
+  const isMobile = variant === 'mobile';
+  const outerCls = isMobile
+    ? 'group relative min-w-[240px] snap-start overflow-hidden rounded-3xl border border-white/10 bg-white/70 p-4 text-left shadow-sm transition hover:shadow-xl dark:bg-zinc-900/60'
+    : 'group relative overflow-hidden rounded-3xl border border-white/10 bg-white/60 p-5 text-left shadow-sm transition hover:shadow-xl dark:bg-zinc-900/60';
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{ duration: 0.4, delay: 0.06 }}
+      className={outerCls}
+    >
+      <div className="relative z-10 flex items-start gap-4">
+        <div className="grid h-12 w-12 place-items-center rounded-2xl bg-blue-600/15 text-blue-300 ring-1 ring-blue-500/25">
+          <Bell className="h-6 w-6" />
+        </div>
+        <div className="flex-1">
+          <div className="flex items-center gap-2">
+            <h3 className="text-lg font-semibold tracking-tight">Cybersécurité</h3>
+            <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white/80 ring-1 ring-white/20">Bientôt</span>
+          </div>
+          <p className="mt-1 text-sm opacity-80">Recevez une notification à l'ouverture du parcours.</p>
+          {!open && status !== 'ok' && (
+            <button type="button" onClick={() => setOpen(true)} className="mt-4 inline-flex items-center gap-2 rounded-xl border border-blue-500/30 bg-blue-600/10 px-3 py-2 text-xs font-semibold text-blue-200 transition hover:bg-blue-600/20">
+              Prévenez-moi
+            </button>
+          )}
+          {(open || status === 'ok') && (
+            <form onSubmit={onSubmit} className="mt-3 space-y-2">
+              {/* Honeypot */}
+              <input type="text" value={hp} onChange={e=>setHp(e.target.value)} className="hidden" tabIndex={-1} aria-hidden="true" />
+              <label htmlFor={`wl-${variant}`} className="sr-only">Email</label>
+              <input
+                id={`wl-${variant}`}
+                type="email"
+                inputMode="email"
+                autoComplete="email"
+                required
+                placeholder="votre@email.com"
+                value={email}
+                onChange={e=>setEmail(e.target.value)}
+                className="w-full rounded-xl border border-white/20 bg-white/70 px-3 py-2 text-sm outline-none dark:bg-zinc-950/60"
+              />
+              <div className="flex items-center gap-2">
+                <button disabled={status==='loading'} className="inline-flex items-center justify-center rounded-xl bg-blue-600 px-3 py-2 text-xs font-semibold text-white disabled:opacity-60">{status==='loading' ? 'Envoi…' : 'S’inscrire'}</button>
+                {status==='ok' && <span className="text-xs text-green-300">C’est noté !</span>}
+                {status==='error' && <span className="text-xs text-yellow-300">Vérifiez votre email.</span>}
+              </div>
+              <div className="text-[10px] opacity-60">Email utilisé uniquement pour cette alerte. Aucune pub.</div>
+            </form>
+          )}
+        </div>
+      </div>
+    </motion.div>
   );
 }
