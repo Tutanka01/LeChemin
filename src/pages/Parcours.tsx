@@ -313,7 +313,7 @@ export default function Parcours() {
         className="relative"
         style={{ willChange: 'transform, opacity' }}
       >
-        {isConnected && (
+  {isConnected && (
           <div className="absolute left-1/2 top-0 h-12 w-0.5 -translate-x-1/2 -translate-y-12 bg-gradient-to-b from-transparent via-zinc-700 to-transparent md:h-16 md:-translate-y-16" />
         )}
   <motion.div
@@ -326,14 +326,17 @@ export default function Parcours() {
           style={{ boxShadow: `0 4px 18px ${step.color}10, inset 0 0 0 1px ${step.color}25`, willChange: 'transform' }}
         >
           <div
-            className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-xl shadow-md sm:h-16 sm:w-16 sm:rounded-2xl"
-            style={{ backgroundColor: `${step.color}22`, boxShadow: `0 4px 14px ${step.color}33` }}
+            className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-xl shadow-md ring-1 ring-transparent transition-all duration-300 group-hover:ring-[var(--step-color)] sm:h-16 sm:w-16 sm:rounded-2xl"
+            style={{ backgroundColor: `${step.color}22`, boxShadow: `0 4px 14px ${step.color}33`, ['--step-color' as any]: step.color }}
           >
-            {React.createElement(step.icon, { className: 'h-7 w-7 sm:h-8 sm:w-8', style: { color: step.color } })}
+            {React.createElement(step.icon, { className: 'h-7 w-7 sm:h-8 sm:w-8 drop-shadow-[0_0_8px_var(--step-color)] transition duration-300', style: { color: step.color, filter: 'drop-shadow(0 0 0 rgba(0,0,0,0))' } })}
           </div>
           <div className="space-y-3 sm:space-y-4">
             <div>
-              <h3 className="text-lg font-bold tracking-tight sm:text-xl">{step.title}</h3>
+              <h3 className="title-underline text-lg font-bold tracking-tight sm:text-xl">
+                {step.title}
+                <span aria-hidden className="block h-[2px] w-0 bg-[var(--step-color)] transition-all duration-300 group-hover:w-16" />
+              </h3>
               <p className="mt-2 text-[13px] leading-relaxed text-zinc-600 dark:text-zinc-300 sm:text-sm">{step.description}</p>
             </div>
             <div className="flex flex-wrap gap-2">

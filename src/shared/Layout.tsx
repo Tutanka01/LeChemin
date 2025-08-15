@@ -11,6 +11,7 @@ export default function Layout() {
   const [open, setOpen] = React.useState(false);
   const glowRef = React.useRef<HTMLDivElement | null>(null);
   const headerRef = React.useRef<HTMLElement | null>(null);
+  const [isScrolled, setIsScrolled] = React.useState(false);
   const accent = '#0052FF';
   const { pathname } = useLocation();
   const { user, signOut } = useAuth();
@@ -41,6 +42,22 @@ export default function Layout() {
     };
   }, []);
 
+  // Accentue le verre du header et calcule la progression de lecture au scroll
+  React.useEffect(() => {
+    let raf = 0;
+    const onScroll = () => {
+      if (raf) return;
+      raf = window.requestAnimationFrame(() => {
+        raf = 0;
+        const y = window.scrollY || document.documentElement.scrollTop || 0;
+        setIsScrolled(y > 8);
+      });
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => { window.removeEventListener('scroll', onScroll); if (raf) cancelAnimationFrame(raf); };
+  }, []);
+
   const onMouseMove = (e: React.MouseEvent) => {
     const el = glowRef.current; if (!el) return;
     const size = 300; const x = e.clientX - size/2; const y = e.clientY - size/2;
@@ -52,9 +69,12 @@ export default function Layout() {
   return (
     <div
       style={{ ["--accent" as any]: accent } as React.CSSProperties}
-  className="relative min-h-screen bg-zinc-50 text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-100"
+      className="relative min-h-screen overflow-x-hidden bg-zinc-50 text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-100"
       onMouseMove={onMouseMove}
     >
+      {/* Mesh global léger (atténué en dark) */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 mesh-bg" />
+
       <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute -top-32 left-1/2 h-[60rem] w-[60rem] -translate-x-1/2 rounded-full blur-3xl" style={{ background: 'radial-gradient(closest-side, var(--accent) 0%, transparent 60%)', opacity: 0.08 }} />
         <svg className="absolute inset-0 h-full w-full opacity-[0.05]" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
@@ -63,9 +83,16 @@ export default function Layout() {
         </svg>
       </div>
 
-      <div ref={glowRef} data-testid="global-glow" aria-hidden className="pointer-events-none fixed z-0 h-[300px] w-[300px] rounded-full opacity-30 blur-2xl" style={{ left: 0, top: 0, background: 'radial-gradient(closest-side, var(--accent), transparent 70%)', transform: 'translate3d(-150px, -150px, 0)', willChange: 'transform', mixBlendMode: 'screen' }} />
+  <div ref={glowRef} data-testid="global-glow" aria-hidden className="pointer-events-none fixed z-[1] h-[300px] w-[300px] rounded-full opacity-30 blur-2xl" style={{ left: 0, top: 0, background: 'radial-gradient(closest-side, var(--accent), transparent 70%)', transform: 'translate3d(-150px, -150px, 0)', willChange: 'transform', mixBlendMode: 'screen' }} />
 
-  <header ref={headerRef} className="sticky top-0 z-50 border-b border-zinc-200/70 bg-white/70 backdrop-blur supports-[backdrop-filter]:bg-white/70 dark:border-white/10 dark:bg-zinc-950/60">
+      <header
+        ref={headerRef}
+        className={`sticky sticky-header top-0 z-50 border-b supports-[backdrop-filter]:bg-white/70 transition-all relative ${
+          isScrolled
+            ? 'scrolled border-zinc-200/80 bg-white/80 backdrop-blur-xl shadow-[0_10px_30px_-15px_rgba(0,0,0,0.2)] dark:border-white/10 dark:bg-zinc-950/70 dark:shadow-[0_10px_30px_-18px_rgba(0,0,0,0.6)]'
+            : 'border-zinc-200/70 bg-white/70 backdrop-blur dark:border-white/10 dark:bg-zinc-950/60'
+        }`}
+      >
         <nav className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-3 md:py-4 md:px-6">
           <Link to="/" className="group inline-flex items-center gap-2" aria-label="Aller à l'accueil">
             <div className="h-7 w-7 rounded-lg" style={{ background: 'linear-gradient(135deg, var(--accent), #1E1E1E)' }} />
@@ -156,6 +183,19 @@ export default function Layout() {
         @media (max-width: 767px) {
           :root { --header-bottom: 60px; }
         }
+  .sticky-header { will-change: backdrop-filter, background-color, box-shadow, border-color; }
+  .mesh-bg { position: fixed; inset: 0; filter: blur(50px); pointer-events: none; z-index: 0; }
+  .mesh-bg::before { content: ""; position: absolute; inset: 0; transform: scale(1.08); transform-origin: center;
+          background:
+            radial-gradient(1200px 600px at 10% 10%, rgba(0,82,255,0.10), transparent 60%),
+            radial-gradient(800px 500px at 80% 0%, rgba(124,58,237,0.10), transparent 60%),
+            radial-gradient(900px 700px at 20% 80%, rgba(16,185,129,0.10), transparent 60%),
+            radial-gradient(600px 600px at 90% 80%, rgba(251,146,60,0.08), transparent 60%);
+          opacity: .6;
+        }
+        :root.dark .mesh-bg::before { opacity: .18; }
+  /* Empêche des conteneurs horizontaux de bloquer la molette verticale */
+  .no-vert-capture { overscroll-behavior-y: contain; }
       `}</style>
     </div>
   );

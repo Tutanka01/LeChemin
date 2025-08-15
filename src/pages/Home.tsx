@@ -56,6 +56,21 @@ export default function Home() {
       {/* HERO */}
       <section className="relative pt-14 md:pt-16">
         <div className="mx-auto max-w-7xl px-4 py-10 md:py-16 md:px-6">
+          {/* Décor animé discret (blobs) */}
+          <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+            <motion.div
+              className="absolute -top-24 -left-10 h-72 w-72 rounded-full opacity-25 blur-3xl"
+              style={{ background: 'radial-gradient(closest-side, var(--accent), transparent 70%)' }}
+              animate={{ x: [0, 15, -10, 0], y: [0, 10, 0, -8] }}
+              transition={{ duration: 18, repeat: Infinity, repeatType: 'mirror', ease: 'easeInOut' }}
+            />
+            <motion.div
+              className="absolute top-28 -right-10 h-80 w-80 rounded-full opacity-20 blur-3xl"
+              style={{ background: 'radial-gradient(closest-side, #7C3AED, transparent 70%)' }}
+              animate={{ x: [0, -10, 12, 0], y: [0, -8, 0, 10] }}
+              transition={{ duration: 20, repeat: Infinity, repeatType: 'mirror', ease: 'easeInOut' }}
+            />
+          </div>
 
           {/* Titre avec effet typewriter */}
           <HeroTitle />
@@ -69,6 +84,23 @@ export default function Home() {
             Des feuilles de route claires, des ressources sélectionnées et un guidage concret. Commencez dès maintenant par le parcours DevOps.
           </motion.p>
 
+          {/* Chips mots-clés (micro-interactions) */}
+          <div className="mt-5 flex flex-wrap gap-2">
+            {['Linux','Git','Docker','Kubernetes','AWS','Terraform','CI/CD','Sécurité'].map((k) => (
+              <motion.span
+                key={k}
+                whileHover={{ y: -2, scale: 1.03 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 22 }}
+                className="group inline-flex items-center gap-1.5 rounded-full border border-zinc-200/70 bg-white px-3 py-1 text-xs text-zinc-700 shadow-sm transition-colors hover:border-blue-200 hover:bg-blue-50/70 dark:border-white/10 dark:bg-white/5 dark:text-zinc-300 dark:hover:bg-white/10"
+              >
+                <span className="inline-block h-1.5 w-1.5 rounded-full bg-blue-500/70 transition-colors group-hover:bg-blue-600/90" />
+                {k}
+              </motion.span>
+            ))}
+          </div>
+
+          {/* Marquee retirée sur demande */}
+
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -77,7 +109,7 @@ export default function Home() {
           >
             <Link
               to="/parcours"
-              className="group inline-flex w-full items-center justify-center gap-2 rounded-2xl px-6 py-3 text-sm font-semibold shadow-lg transition focus:outline-none focus:ring-2 focus:ring-[var(--accent)] sm:w-auto"
+              className="group btn-shine relative inline-flex w-full items-center justify-center gap-2 overflow-hidden rounded-2xl px-6 py-3 text-sm font-semibold shadow-lg transition focus:outline-none focus:ring-2 focus:ring-[var(--accent)] sm:w-auto"
               style={{ background: `linear-gradient(180deg, var(--accent), #1746D1)`, boxShadow: `0 10px 30px ${accent}55`, color: "white" }}
             >
               Commencer le parcours DevOps
@@ -111,6 +143,9 @@ export default function Home() {
             </div>
           )}
 
+          {/* Séparateur subtil */}
+          <div className="mt-10 h-px bg-gradient-to-r from-transparent via-zinc-200 to-transparent dark:via-white/10" />
+
           {/* Le CTA waitlist est déplacé sous la section Parcours (ci-dessous) */}
         </div>
       </section>
@@ -126,7 +161,7 @@ export default function Home() {
             <p className="-mt-2 mb-6 text-xs opacity-70 sm:text-sm">À venir : Cybersécurité, Frontend, Backend, Data Scientist, IA/ML.</p>
 
           {/* Mobile horizontal scroll */}
-          <div className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4 sm:hidden px-4">
+          <div className="-mx-4 flex gap-4 overflow-x-auto pb-4 sm:hidden px-4 touch-pan-x overscroll-x-contain">
             {paths.map(({ title, desc, icon: Icon }, i) => (
               <motion.div
                 key={title}
@@ -279,7 +314,7 @@ function HeroTitle() {
       Des parcours clairs pour
       <span className="block sm:inline"> </span>
       <span className="relative inline-flex items-baseline">
-        <span className="relative z-10 bg-gradient-to-r from-[var(--accent)] to-[#7C3AED] bg-clip-text text-transparent">
+  <span className="relative z-10 bg-gradient-to-r from-[var(--accent)] via-[#5A79FF] to-[#7C3AED] bg-clip-text text-transparent animate-[gradshift_6s_ease_infinite]">
           {text || "\u00A0"}
           {text.length > 0 && (
             <span aria-hidden className="pointer-events-none absolute inset-x-0 -bottom-1 h-2 rounded-full bg-gradient-to-r from-blue-500/20 to-purple-500/20 blur-sm" />
@@ -287,8 +322,11 @@ function HeroTitle() {
         </span>
         <span className="ml-1 inline-block h-[1em] w-[2px] translate-y-[2px] animate-[caret_1s_steps(2)_infinite] bg-[var(--accent)] align-baseline" aria-hidden />
       </span>
-      <style>{`
+    <style>{`
         @keyframes caret { 50% { opacity: 0; } }
+  .btn-shine::before { content:''; position:absolute; inset:0; transform:translateX(-120%); background:linear-gradient(90deg, transparent, rgba(255,255,255,.35), transparent); transition: transform .7s ease, opacity .2s; opacity:0; }
+  .btn-shine:hover::before { transform:translateX(120%); opacity:1; }
+  @keyframes gradshift { 0% { filter:hue-rotate(0deg); } 50% { filter:hue-rotate(12deg); } 100% { filter:hue-rotate(0deg); } }
       `}</style>
     </motion.h1>
   );
