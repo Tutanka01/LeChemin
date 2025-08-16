@@ -55,7 +55,7 @@ type QuizQuestion = {
 // Nouveau schéma basé sur des COMPÉTENCES (pour l'UI finale)
 type CompetencyLevel = 'debutant' | 'intermediaire' | 'avance';
 type SkillResourceHint = { title: string; url: string; type?: 'doc' | 'video' | 'article' };
-type Subskill = { id: string; name: string; why: string; tips?: string; suggested_resources?: SkillResourceHint[] };
+type Subskill = { id: string; name: string; why: string; tips?: string; actions?: string[]; suggested_resources?: SkillResourceHint[] };
 type Competency = { id: string; name: string; description: string; level: CompetencyLevel; outcomes: string[]; subskills: Subskill[] };
 type PracticeItem = { id: string; title: string; description: string; est_hours?: number };
 type SkillsRoadmap = { topic: string; profile_summary: string; estimated_weeks: number; competencies: Competency[]; practice?: PracticeItem[] };
@@ -140,6 +140,10 @@ function validateSkillsRoadmap(payload: unknown): payload is SkillsRoadmap {
         if (typeof (s as any).name !== 'string' || !(s as any).name) return false;
         if (typeof (s as any).why !== 'string') return false;
         if ((s as any).tips && typeof (s as any).tips !== 'string') return false;
+        if ((s as any).actions) {
+          if (!Array.isArray((s as any).actions)) return false;
+          if (!(s as any).actions.every((a: unknown) => typeof a === 'string' && a.length > 0 && a.length <= 160)) return false;
+        }
         if ((s as any).suggested_resources) {
           if (!Array.isArray((s as any).suggested_resources)) return false;
           for (const h of (s as any).suggested_resources) {
@@ -199,6 +203,7 @@ Réponds STRICTEMENT au format JSON ci-dessous (sans aucun texte autour). N'AJOU
       "name": string,
       "why": string,
       "tips"?: string,
+  "actions"?: string[],
       "suggested_resources"?: Array<{ "title": string, "url": string, "type"?: "doc" | "video" | "article" }>
     }>
   }>,
@@ -215,6 +220,8 @@ Contraintes de QUALITÉ et PERSONNALISATION:
 - Adapte les niveaux aux réponses: débutant → bases claires; intermédiaire → consolidation + structuration; avancé → perfectionnement/projets ambitieux.
 - Si l'utilisateur indique un temps hebdo (ex: "2–4h"), ajuste "estimated_weeks" de façon réaliste; sinon, fournis une estimation prudente.
 - "outcomes" doivent être ACTIONNABLES (verbes mesurables: "concevoir", "déployer", "automatiser", ...), et vérifiables.
+ - "outcomes" doivent être ACTIONNABLES (verbes mesurables: "concevoir", "déployer", "automatiser", ...), et vérifiables.
+ - Pour chaque sous-compétence, fournis 2–6 "actions" concrètes, atomiques et cochables par l’utilisateur (phrases courtes, impératif). Exemple: "Installer Docker", "Écrire un Dockerfile minimal", "Construire une image locale", "Publier sur un registry".
 - Évite les redondances entre compétences; chaque compétence doit ajouter une capacité distincte.
 - "suggested_resources" est OPTIONNELLE (0–2 max) et uniquement des références STABLES (docs officielles, articles de fond). PAS de contenu douteux ni réseau social.
 - Mets en avant la PRATIQUE: si possible, ajoute 1–3 "practice" alignés aux priorités/objectif indiqués.

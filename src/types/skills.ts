@@ -12,6 +12,10 @@ export type Subskill = {
   why: string;
   tips?: string;
   suggested_resources?: SkillResourceHint[];
+  // Actions concrètes et vérifiables que l’utilisateur peut cocher.
+  // Exemple: ["Installer Docker", "Construire une image avec Dockerfile", "Déployer avec Compose"].
+  // Rester concis (2–6 actions). Si absent, l’UI n’affiche que la description.
+  actions?: string[];
 };
 
 export type Competency = {

@@ -144,8 +144,14 @@ export async function generateRoadmap(state: QuizState): Promise<SkillsRoadmap> 
           `Appliquer les bases dans un petit projet`
         ],
         subskills: [
-          { id: 'vocabulaire', name: 'Vocabulaire clé', why: `Maîtriser les termes courants liés à ${g}.` },
-          { id: 'premiere-pratique', name: 'Première pratique', why: 'Ancrer les notions par la pratique.', tips: 'Objectifs courts et réguliers.' }
+          { id: 'vocabulaire', name: 'Vocabulaire clé', why: `Maîtriser les termes courants liés à ${g}.`, actions: [
+            'Lister 10 termes essentiels et leurs définitions',
+            'Créer une fiche mémo personnelle'
+          ] },
+          { id: 'premiere-pratique', name: 'Première pratique', why: 'Ancrer les notions par la pratique.', tips: 'Objectifs courts et réguliers.', actions: [
+            'Suivre un tutoriel pas-à-pas',
+            'Réaliser un mini-exercice (30–60 min)'
+          ] }
         ]
       },
       {
@@ -155,8 +161,14 @@ export async function generateRoadmap(state: QuizState): Promise<SkillsRoadmap> 
         level: 'intermediaire',
         outcomes: [ 'Résoudre des cas concrets', 'Structurer une démarche' ],
         subskills: [
-          { id: 'analyse', name: 'Analyse de cas', why: 'Développer le raisonnement et la prise de décision.' },
-          { id: 'bonne-pratiques', name: 'Bonnes pratiques', why: 'Améliorer la qualité et la robustesse.' }
+          { id: 'analyse', name: 'Analyse de cas', why: 'Développer le raisonnement et la prise de décision.', actions: [
+            'Étudier 2 études de cas',
+            'Rédiger vos propres solutions et compromis'
+          ] },
+          { id: 'bonne-pratiques', name: 'Bonnes pratiques', why: 'Améliorer la qualité et la robustesse.', actions: [
+            'Lister 5 règles à appliquer systématiquement',
+            'Mettre en place une checklist de revue'
+          ] }
         ]
       }
     ],
