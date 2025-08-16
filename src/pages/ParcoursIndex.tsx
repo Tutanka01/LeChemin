@@ -97,6 +97,11 @@ export default function ParcoursIndex() {
             <p className="max-w-2xl text-zinc-600 dark:text-zinc-300">
               Commencez à apprendre dès aujourd'hui. Gratuit, en français, structuré pour progresser.
             </p>
+            <div className="mt-4">
+              <Link to="/parcours/personnalise" className="inline-flex items-center gap-2 rounded-xl border border-zinc-200/70 bg-white px-4 py-2 text-sm font-semibold transition hover:bg-zinc-50 dark:border-white/10 dark:bg-white/10 dark:hover:bg-white/20">
+                Créer un parcours personnalisé
+              </Link>
+            </div>
           </motion.div>
         </div>
       </section>

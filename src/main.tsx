@@ -6,6 +6,7 @@ import Layout from './shared/Layout.tsx';
 import Home from './pages/Home';
 import Parcours from './pages/Parcours';
 import ParcoursIndex from './pages/ParcoursIndex';
+import ParcoursPersonnalise from './pages/ParcoursPersonnalise';
 import { AuthProvider } from './context/AuthContext';
 import AuthPage from './pages/auth/Auth';
 import AuthCallback from './pages/auth/Callback';
@@ -22,6 +23,7 @@ function App() {
               <Route path="/auth/callback" element={<AuthCallback />} />
               <Route path="/parcours" element={<ParcoursIndex />} />
               <Route path="/parcours/devops" element={<Parcours />} />
+              <Route path="/parcours/personnalise" element={<ParcoursPersonnalise />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Route>
           </Routes>
