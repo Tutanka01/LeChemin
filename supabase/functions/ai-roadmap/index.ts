@@ -180,7 +180,9 @@ function validateQuiz(payload: unknown): payload is QuizQuestion[] {
   return true;
 }
 
-const SKILLS_PROMPT = `Tu es un assistant pédagogique francophone. Génère une feuille de route basée sur des COMPÉTENCES (pas une liste de ressources), adaptée à l'objectif et aux réponses de l'utilisateur. Réponds STRICTEMENT au format JSON suivant (sans texte autour):
+const SKILLS_PROMPT = `Tu es un assistant pédagogique francophone. Ta mission: produire une FEUILLE DE ROUTE PAR COMPÉTENCES, ultra-personnalisée à l'objectif et AUX RÉPONSES de l'utilisateur. Tu dois CONSOLIDER le niveau de départ, respecter ses contraintes (temps, priorités, contexte) et proposer une progression claire orientée résultats.
+
+Réponds STRICTEMENT au format JSON ci-dessous (sans aucun texte autour). N'AJOUTE PAS de clés non prévues et respecte l'orthographe française:
 
 {
   "topic": string,
@@ -208,14 +210,18 @@ const SKILLS_PROMPT = `Tu es un assistant pédagogique francophone. Génère une
   }>
 }
 
-Contraintes:
-- 3 à 6 compétences max, progressives, avec 2 à 5 sous-compétences chacune.
-- "outcomes" doit être actionnable et vérifiable.
-- "suggested_resources" est OPTIONNELLE (0-2 max) et uniquement des références stables (docs officielles, articles de fond).
-- Pas de texte hors JSON, pas de markdown.
+Contraintes de QUALITÉ et PERSONNALISATION:
+- 3 à 6 compétences MAX, PROGRESSIVES, chacune avec 2 à 5 sous-compétences.
+- Adapte les niveaux aux réponses: débutant → bases claires; intermédiaire → consolidation + structuration; avancé → perfectionnement/projets ambitieux.
+- Si l'utilisateur indique un temps hebdo (ex: "2–4h"), ajuste "estimated_weeks" de façon réaliste; sinon, fournis une estimation prudente.
+- "outcomes" doivent être ACTIONNABLES (verbes mesurables: "concevoir", "déployer", "automatiser", ...), et vérifiables.
+- Évite les redondances entre compétences; chaque compétence doit ajouter une capacité distincte.
+- "suggested_resources" est OPTIONNELLE (0–2 max) et uniquement des références STABLES (docs officielles, articles de fond). PAS de contenu douteux ni réseau social.
+- Mets en avant la PRATIQUE: si possible, ajoute 1–3 "practice" alignés aux priorités/objectif indiqués.
+- Pas de texte hors JSON. Pas de markdown. Respecte EXACTEMENT le schéma.
 `;
 
-const QUIZ_PROMPT = `Tu es un assistant pédagogique francophone. Génère un court quiz de 3 à 6 questions pertinentes pour mieux comprendre le niveau et le contexte de l'utilisateur lié à son objectif. Réponds STRICTEMENT avec un tableau JSON d'objets, sans texte autour.
+const QUIZ_PROMPT = `Tu es un assistant pédagogique francophone. Génère un court quiz (3 à 6 questions) pour comprendre le NIVEAU, le CONTEXTE et les CONTRAINTES de l'utilisateur par rapport à son objectif. Réponds STRICTEMENT avec un TABLEAU JSON d'objets, sans texte autour.
 
 Chaque question suit ce schéma TypeScript:
 {
@@ -227,17 +233,18 @@ Chaque question suit ce schéma TypeScript:
 }
 
 Contraintes:
-- Aucune hypothèse technique spécifique si l'objectif ne l'implique pas.
-- Mélange raisonnable de formats (single, multi, text).
-- Questions neutres et adaptées au sujet.
+- Pas d'hypothèse technique si l'objectif ne l'implique pas.
+- Mélange de formats (single, multi, text).
+- Questions neutres, précises et adaptées au sujet.
+- Couvre idéalement: expérience, contexte d'usage, temps hebdo, priorités d'apprentissage, objectif concret.
 `;
 
-const QUIZ_FOLLOWUP_PROMPT = `Tu es un assistant pédagogique francophone. En te basant sur l'objectif et les RÉPONSES DÉJÀ RECUEILLIES de l'utilisateur, décide si d'autres questions sont nécessaires.
+const QUIZ_FOLLOWUP_PROMPT = `Tu es un assistant pédagogique francophone. En te basant sur l'objectif et les RÉPONSES DÉJÀ RECUEILLIES, décide si d'autres questions sont nécessaires.
 
 Réponds STRICTEMENT avec un tableau JSON d'objets (même schéma que le quiz initial). Si les informations sont suffisantes pour générer une roadmap de COMPÉTENCES pertinente, renvoie UN TABLEAU VIDE []. Sinon, renvoie 1 à 3 questions MAXIMUM, très ciblées.
 
 Rappels:
-- 0 question si suffisant, sinon 1–3 maximum.
+- 0 question si suffisant, sinon 1–3 maximum ciblées UNIQUEMENT sur les manques critiques (ex: temps hebdo, priorités, contexte).
 - Pas de texte hors JSON, pas de markdown.
 `;
 

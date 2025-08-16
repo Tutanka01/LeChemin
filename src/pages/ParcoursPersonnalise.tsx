@@ -5,6 +5,8 @@ import type { SkillsRoadmap, Competency } from '../types/skills';
 import { startQuiz, nextQuestions, generateRoadmap, type QuizQuestion, type QuizState } from '../lib/aiClient';
 import { saveRoadmap } from '../api/roadmaps';
 import { useAuth } from '../context/AuthContext';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Sparkles, Clock3, Target, Check, ChevronDown } from 'lucide-react';
 
 export default function ParcoursPersonnalise() {
   const { user, loading: authLoading } = useAuth();
@@ -166,20 +168,72 @@ export default function ParcoursPersonnalise() {
 
       {step === 'result' && roadmap && (
         <section>
-          <h2 className="text-2xl font-bold tracking-tight">Compétences pour: {roadmap.topic}</h2>
-          <p className="mt-1 opacity-80">{roadmap.profile_summary}</p>
-          <p className="mt-1 text-sm opacity-70">Estimation: {roadmap.estimated_weeks} semaines</p>
-          <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {roadmap.competencies.map((c) => (
-              <CompetencyCard key={c.id} competency={c} />
-            ))}
+          {/* Hero moderne */}
+          <div className="relative overflow-hidden rounded-3xl border border-zinc-200/70 bg-white dark:border-white/10 dark:bg-zinc-900">
+            <div aria-hidden className="absolute inset-0 opacity-70" style={{background:'radial-gradient(1200px 500px at 20% -10%, rgba(0,82,255,.18), transparent 60%), radial-gradient(800px 400px at 100% 0%, rgba(124,58,237,.18), transparent 60%)'}} />
+            <div className="relative p-6 md:p-8">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <div className="inline-flex items-center gap-2 rounded-full bg-blue-600/10 px-3 py-1 text-xs font-medium text-blue-700 ring-1 ring-blue-600/20 dark:text-blue-200">Parcours personnalisé <Sparkles className="h-3.5 w-3.5"/></div>
+                  <h2 className="mt-2 text-2xl font-black tracking-tight md:text-3xl">{roadmap.topic}</h2>
+                  <p className="mt-2 max-w-3xl text-sm opacity-85 md:text-base">{roadmap.profile_summary}</p>
+                </div>
+                <div className="hidden md:block rounded-2xl border border-white/10 bg-white/5 p-4 text-center text-sm backdrop-blur dark:bg-white/5">
+                  <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-2.5 py-1 text-xs"><Clock3 className="h-3.5 w-3.5"/> Estimé</div>
+                  <div className="mt-1 text-2xl font-bold">{roadmap.estimated_weeks}<span className="ml-1 text-sm font-normal opacity-70">semaines</span></div>
+                </div>
+              </div>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <span className="rounded-full bg-white px-3 py-1 text-xs ring-1 ring-zinc-200/70 dark:bg-white/5 dark:ring-white/10">Objectif: {goal}</span>
+                <span className="rounded-full bg-white px-3 py-1 text-xs ring-1 ring-zinc-200/70 dark:bg-white/5 dark:ring-white/10">Compétences: {roadmap.competencies.length}</span>
+              </div>
+              <div className="mt-5 flex flex-wrap gap-3">
+                <button className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"><Target className="h-4 w-4"/> Commencer</button>
+                <button
+                  disabled={saveStatus==='saving'}
+                  onClick={async ()=>{
+                    if (!roadmap) return;
+                    setSaveStatus('saving');
+                    const res = await saveRoadmap(roadmap);
+                    if ('error' in res) setSaveStatus('error'); else setSaveStatus('saved');
+                    setTimeout(()=> setSaveStatus('idle'), 2500);
+                  }}
+                  className="inline-flex items-center gap-2 rounded-xl border border-zinc-200/70 bg-white px-4 py-2 text-sm dark:border-white/10 dark:bg-zinc-900/60 disabled:opacity-60"
+                >
+                  {saveStatus==='saving' ? 'Enregistrement…' : saveStatus==='saved' ? 'Enregistré ✓' : 'Enregistrer'}
+                </button>
+                <Link to="/parcours" className="inline-flex items-center gap-2 rounded-xl border border-zinc-200/70 bg-white px-4 py-2 text-sm dark:border-white/10 dark:bg-zinc-900/60">Voir tous les parcours</Link>
+              </div>
+            </div>
           </div>
+
+          {/* Timeline des compétences */}
+          <div className="mt-8">
+            <ol className="relative ml-3 border-l border-zinc-200/70 dark:border-white/10">
+              <AnimatePresence initial={true}>
+                {roadmap.competencies.map((c, idx) => (
+                  <motion.li
+                    key={c.id}
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -12 }}
+                    transition={{ duration: 0.25, delay: idx * 0.04 }}
+                    className="group relative -ml-3 mb-4 pl-6"
+                  >
+                    <span className="absolute -left-3 top-2 grid h-6 w-6 place-items-center rounded-full bg-blue-600 text-white shadow ring-4 ring-white dark:ring-zinc-950">{idx+1}</span>
+                    <TimelineCard competency={c} />
+                  </motion.li>
+                ))}
+              </AnimatePresence>
+            </ol>
+          </div>
+
           {roadmap.practice && roadmap.practice.length > 0 && (
-            <div className="mt-8">
+            <div className="mt-10">
               <h3 className="text-lg font-semibold">Exercices pratiques</h3>
-              <ul className="mt-2 grid grid-cols-1 gap-3 md:grid-cols-2">
+              <ul className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2">
                 {roadmap.practice.map((p) => (
-                  <li key={p.id} className="rounded-xl border border-zinc-200/70 bg-white p-4 text-sm dark:border-white/10 dark:bg-zinc-900/60">
+                  <li key={p.id} className="rounded-2xl border border-zinc-200/70 bg-white p-4 text-sm dark:border-white/10 dark:bg-zinc-900/60">
                     <div className="font-semibold">{p.title}</div>
                     <div className="opacity-80">{p.description}</div>
                     {p.est_hours ? <div className="mt-1 text-xs opacity-60">~{p.est_hours}h</div> : null}
@@ -188,23 +242,6 @@ export default function ParcoursPersonnalise() {
               </ul>
             </div>
           )}
-          <div className="mt-4 flex flex-wrap gap-2">
-            <button className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white">Commencer ce parcours</button>
-            <button
-              disabled={saveStatus==='saving'}
-              onClick={async ()=>{
-                if (!roadmap) return;
-                setSaveStatus('saving');
-                const res = await saveRoadmap(roadmap);
-                if ('error' in res) setSaveStatus('error'); else setSaveStatus('saved');
-                setTimeout(()=> setSaveStatus('idle'), 2500);
-              }}
-              className="inline-flex items-center gap-2 rounded-xl border border-zinc-200/70 bg-white px-4 py-2 text-sm dark:border-white/10 dark:bg-zinc-900/60 disabled:opacity-60"
-            >
-              {saveStatus==='saving' ? 'Enregistrement…' : saveStatus==='saved' ? 'Enregistré ✓' : 'Enregistrer'}
-            </button>
-            <Link to="/parcours" className="rounded-xl border border-zinc-200/70 bg-white px-4 py-2 text-sm dark:border-white/10 dark:bg-zinc-900/60">Voir tous les parcours</Link>
-          </div>
         </section>
       )}
 
@@ -230,44 +267,53 @@ function Badge({ level }: { level: Competency['level'] }) {
   return <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium ${map[level]}`}>{level}</span>;
 }
 
-function CompetencyCard({ competency }: { competency: Competency }) {
+function TimelineCard({ competency }: { competency: Competency }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="group relative overflow-hidden rounded-3xl border border-zinc-200/70 bg-white p-5 transition-shadow hover:shadow-xl dark:border-white/10 dark:bg-zinc-900/60">
-      <div className="absolute -inset-px -z-10 opacity-0 transition-opacity group-hover:opacity-100" style={{ background: 'linear-gradient(135deg, #22d3ee22, #818cf822)' }} />
-      <div className="flex items-start justify-between gap-3">
+    <div className="overflow-hidden rounded-2xl border border-zinc-200/70 bg-white dark:border-white/10 dark:bg-zinc-900/60">
+      <div className="flex items-start justify-between gap-3 p-4">
         <div>
-          <h3 className="text-lg font-semibold tracking-tight">{competency.name}</h3>
-          <p className="mt-1 text-sm opacity-80">{competency.description}</p>
-          <div className="mt-2 flex items-center gap-2">
+          <div className="inline-flex items-center gap-2">
+            <h3 className="text-lg font-semibold tracking-tight">{competency.name}</h3>
             <Badge level={competency.level} />
-            <span className="text-xs opacity-60">{competency.outcomes.length} résultats</span>
           </div>
+          <p className="mt-1 text-sm opacity-80">{competency.description}</p>
+          <div className="mt-2 text-xs opacity-60">{competency.outcomes.length} résultats attendus</div>
         </div>
-        <button onClick={() => setOpen(v=>!v)} className="rounded-xl border border-zinc-200/70 bg-white px-2 py-1 text-xs dark:border-white/10 dark:bg-white/10">{open ? 'Masquer' : 'Détails'}</button>
+        <button onClick={() => setOpen(v=>!v)} className="inline-flex items-center gap-1 rounded-xl border border-zinc-200/70 bg-white px-2 py-1 text-xs dark:border-white/10 dark:bg-white/10">
+          {open ? <><Check className="h-3.5 w-3.5"/> Masquer</> : <><ChevronDown className="h-3.5 w-3.5"/> Détails</>}
+        </button>
       </div>
-      {open && (
-        <div className="mt-3 space-y-3">
-          <div>
-            <div className="text-xs font-medium uppercase tracking-wide opacity-70">Résultats attendus</div>
-            <ul className="mt-1 list-disc space-y-1 pl-5 text-sm">
-              {competency.outcomes.map((o, i) => (<li key={i}>{o}</li>))}
-            </ul>
-          </div>
-          <div>
-            <div className="text-xs font-medium uppercase tracking-wide opacity-70">Sous-compétences</div>
-            <ul className="mt-1 space-y-2">
-              {competency.subskills.map((s) => (
-                <li key={s.id} className="rounded-xl border border-zinc-200/70 bg-white p-3 text-sm dark:border-white/10 dark:bg-zinc-900/40">
-                  <div className="font-medium">{s.name}</div>
-                  <div className="opacity-80">{s.why}</div>
-                  {s.tips ? <div className="mt-1 text-xs opacity-70">Astuce: {s.tips}</div> : null}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      )}
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="border-t border-zinc-200/70 p-4 text-sm dark:border-white/10"
+          >
+            <div>
+              <div className="text-xs font-medium uppercase tracking-wide opacity-70">Résultats attendus</div>
+              <ul className="mt-1 list-disc space-y-1 pl-5">
+                {competency.outcomes.map((o, i) => (<li key={i}>{o}</li>))}
+              </ul>
+            </div>
+            <div className="mt-4">
+              <div className="text-xs font-medium uppercase tracking-wide opacity-70">Sous-compétences</div>
+              <ul className="mt-1 space-y-2">
+                {competency.subskills.map((s) => (
+                  <li key={s.id} className="rounded-xl border border-zinc-200/70 bg-white p-3 dark:border-white/10 dark:bg-zinc-900/40">
+                    <div className="font-medium">{s.name}</div>
+                    <div className="opacity-80">{s.why}</div>
+                    {s.tips ? <div className="mt-1 text-xs opacity-70">Astuce: {s.tips}</div> : null}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

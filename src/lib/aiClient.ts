@@ -111,7 +111,7 @@ export async function generateRoadmap(state: QuizState): Promise<SkillsRoadmap> 
       const resp = await fetch(endpoint, {
         method: 'POST',
         headers: await buildHeaders(),
-  body: JSON.stringify({ goal: state.goal, answers: state.answers }),
+  body: JSON.stringify({ action: 'roadmap', goal: state.goal, answers: state.answers }),
       });
       if (resp.ok) {
   const data = (await resp.json()) as SkillsRoadmap;
