@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext';
 export default function Layout() {
   // Initialise à partir de la classe HTML (définie tôt dans index.html) pour éviter le FOUC
   const [isDark, setIsDark] = React.useState(() =>
-    typeof document !== 'undefined' ? document.documentElement.classList.contains('dark') : true
+    typeof document !== 'undefined' ? document.documentElement.classList.contains('dark') : false
   );
   const [open, setOpen] = React.useState(false);
   const glowRef = React.useRef<HTMLDivElement | null>(null);

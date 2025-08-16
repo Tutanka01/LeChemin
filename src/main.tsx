@@ -7,6 +7,7 @@ import Home from './pages/Home';
 import Parcours from './pages/Parcours';
 import { AuthProvider } from './context/AuthContext';
 import AuthPage from './pages/auth/Auth';
+import AuthCallback from './pages/auth/Callback';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
             <Route element={<Layout />}>
               <Route path="/" element={<Home />} />
               <Route path="/auth" element={<AuthPage />} />
+              <Route path="/auth/callback" element={<AuthCallback />} />
               <Route path="/parcours" element={<Parcours />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Route>
