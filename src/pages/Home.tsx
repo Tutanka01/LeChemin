@@ -6,7 +6,7 @@ import { Helmet } from 'react-helmet-async';
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { motion } from "framer-motion";
-import { ServerCog, ChevronRight, Compass, BookOpenCheck, ExternalLink, Bell } from "lucide-react";
+import { ServerCog, ChevronRight, Compass, BookOpenCheck, ExternalLink, Bell, Sparkles } from "lucide-react";
 import { addToWaitlist } from '../api/waitlist';
 
 export default function Home() {
@@ -135,6 +135,13 @@ export default function Home() {
               <ChevronRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
             </Link>
 
+            <Link
+              to="/parcours/personnalise"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-zinc-200/70 bg-white px-6 py-3 text-sm font-semibold backdrop-blur transition hover:bg-zinc-50 dark:border-white/15 dark:bg-zinc-900/60 dark:hover:bg-zinc-900 sm:w-auto"
+            >
+              <Sparkles className="h-4 w-4" /> Créer mon parcours personnalisé
+            </Link>
+
             <a
               href="#mission"
               className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-zinc-200/70 bg-white px-6 py-3 text-sm font-semibold backdrop-blur transition hover:bg-zinc-50 dark:border-white/15 dark:bg-zinc-900/60 dark:hover:bg-zinc-900 sm:w-auto"
@@ -204,6 +211,8 @@ export default function Home() {
                 </Link>
               </motion.div>
             ))}
+            {/* Carte parcours personnalisé (mobile) */}
+            <PersonalizedCard variant="mobile" />
             {/* Carte waitlist (mobile) */}
             <WaitlistCard variant="mobile" />
           </div>
@@ -233,6 +242,8 @@ export default function Home() {
                 </Link>
               </motion.div>
             ))}
+            {/* Carte parcours personnalisé (desktop/tablette) */}
+            <PersonalizedCard variant="desktop" />
             {/* Carte waitlist (desktop/tablette) */}
             <WaitlistCard variant="desktop" />
           </div>
@@ -423,6 +434,38 @@ function WaitlistCard({ variant }: { variant: 'mobile' | 'desktop' }) {
               <div className="text-[10px] opacity-60">Email utilisé uniquement pour cette alerte. Aucune pub.</div>
             </form>
           )}
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+function PersonalizedCard({ variant }: { variant: 'mobile' | 'desktop' }) {
+  const isMobile = variant === 'mobile';
+  const outerCls = isMobile
+    ? 'group relative min-w-[240px] snap-start overflow-hidden rounded-3xl border border-zinc-200/70 bg-white p-4 text-left shadow-sm transition hover:shadow-xl dark:border-white/10 dark:bg-zinc-900/60'
+    : 'group relative overflow-hidden rounded-3xl border border-zinc-200/70 bg-white p-5 text-left shadow-sm transition hover:shadow-xl dark:border-white/10 dark:bg-zinc-900/60';
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{ duration: 0.4, delay: 0.06 }}
+      className={outerCls}
+    >
+      <div className="relative z-10 flex items-start gap-4">
+        <div className="grid h-12 w-12 place-items-center rounded-2xl bg-purple-50 text-purple-600 ring-1 ring-purple-200 dark:bg-purple-600/15 dark:text-purple-300 dark:ring-purple-500/25">
+          <Sparkles className="h-6 w-6" />
+        </div>
+        <div className="flex-1">
+          <div className="flex items-center gap-2">
+            <h3 className="text-lg font-semibold tracking-tight">Parcours personnalisé</h3>
+            <span className="rounded-full bg-purple-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-purple-700 ring-1 ring-purple-200 dark:bg-white/10 dark:text-white/80 dark:ring-white/20">Nouveau</span>
+          </div>
+          <p className="mt-1 text-sm opacity-80">Un quiz intelligent pour générer votre roadmap basée compétences.</p>
+          <Link to="/parcours/personnalise" className="mt-3 inline-flex items-center gap-2 text-xs font-medium text-purple-700 hover:underline dark:text-purple-300">
+            Créer mon parcours <ChevronRight className="h-4 w-4" />
+          </Link>
         </div>
       </div>
     </motion.div>

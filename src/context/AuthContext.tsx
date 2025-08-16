@@ -52,7 +52,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         email,
         password,
         options: {
-          emailRedirectTo: typeof window !== 'undefined' ? `${window.location.origin}/auth/callback?next=%2Fparcours` : undefined,
+          emailRedirectTo: typeof window !== 'undefined' ? `${window.location.origin}/auth/callback?next=${encodeURIComponent(new URLSearchParams(window.location.search).get('next') || '/parcours')}` : undefined,
         }
       });
       if (error) return { error: error.message };
@@ -62,7 +62,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'github',
         options: {
-          redirectTo: typeof window !== 'undefined' ? `${window.location.origin}/auth/callback?next=%2Fparcours` : undefined,
+          redirectTo: typeof window !== 'undefined' ? `${window.location.origin}/auth/callback?next=${encodeURIComponent(new URLSearchParams(window.location.search).get('next') || '/parcours')}` : undefined,
         }
       });
       if (error) return { error: error.message };
@@ -72,7 +72,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: typeof window !== 'undefined' ? `${window.location.origin}/auth/callback?next=%2Fparcours` : undefined,
+          redirectTo: typeof window !== 'undefined' ? `${window.location.origin}/auth/callback?next=${encodeURIComponent(new URLSearchParams(window.location.search).get('next') || '/parcours')}` : undefined,
           queryParams: { prompt: 'select_account' }
         }
       });

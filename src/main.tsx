@@ -10,6 +10,8 @@ import ParcoursPersonnalise from './pages/ParcoursPersonnalise';
 import { AuthProvider } from './context/AuthContext';
 import AuthPage from './pages/auth/Auth';
 import AuthCallback from './pages/auth/Callback';
+import MesParcours from './pages/MesParcours';
+import MesParcoursDetail from './pages/MesParcoursDetail.tsx';
 
 function App() {
   return (
@@ -24,6 +26,8 @@ function App() {
               <Route path="/parcours" element={<ParcoursIndex />} />
               <Route path="/parcours/devops" element={<Parcours />} />
               <Route path="/parcours/personnalise" element={<ParcoursPersonnalise />} />
+              <Route path="/mes-parcours" element={<MesParcours />} />
+              <Route path="/mes-parcours/:id" element={<MesParcoursDetail />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Route>
           </Routes>

@@ -1,10 +1,13 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import type { SkillsRoadmap, Competency } from '../types/skills';
 import { startQuiz, nextQuestions, generateRoadmap, type QuizQuestion, type QuizState } from '../lib/aiClient';
+import { saveRoadmap } from '../api/roadmaps';
+import { useAuth } from '../context/AuthContext';
 
 export default function ParcoursPersonnalise() {
+  const { user, loading: authLoading } = useAuth();
   const [step, setStep] = useState<'goal' | 'quiz' | 'result'>('goal');
   const [goal, setGoal] = useState('');
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
@@ -12,7 +15,9 @@ export default function ParcoursPersonnalise() {
   const [loading, setLoading] = useState(false);
   const [roadmap, setRoadmap] = useState<SkillsRoadmap | null>(null);
   const [uiLoading, setUiLoading] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<'idle'|'saving'|'saved'|'error'>('idle');
   const state: QuizState = { goal, answers };
+  const nextParam = useMemo(() => encodeURIComponent('/parcours/personnalise'), []);
 
   async function handleStart() {
     setLoading(true); setUiLoading(true);
@@ -39,6 +44,41 @@ export default function ParcoursPersonnalise() {
     } finally {
       setLoading(false); setUiLoading(false);
     }
+  }
+
+  // Garde d'auth: exiger connexion avant d'accéder au quiz personnalisé
+  if (authLoading) {
+    return (
+      <div className="mx-auto max-w-4xl px-4 py-10 md:px-6">
+        <Helmet>
+          <title>Parcours personnalisé | LeChemin.tech</title>
+        </Helmet>
+        <div className="mx-auto max-w-sm rounded-2xl border border-zinc-200/70 bg-white p-6 text-center dark:border-white/10 dark:bg-zinc-900/60">
+          <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-zinc-300 border-t-blue-600" />
+          <div className="mt-2 text-sm opacity-80">Chargement…</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="mx-auto max-w-3xl px-4 py-12 md:px-6">
+        <Helmet>
+          <title>Connexion requise | LeChemin.tech</title>
+          <meta name="robots" content="noindex" />
+        </Helmet>
+        <nav className="mb-6 text-sm opacity-80"><Link to="/parcours" className="underline-offset-4 hover:underline">← Tous les parcours</Link></nav>
+        <div className="rounded-3xl border border-zinc-200/70 bg-white p-6 text-center dark:border-white/10 dark:bg-zinc-900/60">
+          <h1 className="text-2xl font-bold tracking-tight">Créez votre parcours personnalisé</h1>
+          <p className="mx-auto mt-2 max-w-md text-sm opacity-80">Connectez-vous ou créez un compte gratuit pour utiliser le générateur de parcours personnalisé et sauvegarder vos progrès.</p>
+          <div className="mt-5 flex flex-wrap justify-center gap-3">
+            <Link to={`/auth?next=${nextParam}`} className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700">Se connecter / S’enregistrer</Link>
+            <Link to="/parcours" className="inline-flex items-center gap-2 rounded-xl border border-zinc-200/70 bg-white px-5 py-2.5 text-sm dark:border-white/10 dark:bg-zinc-900/60">Voir les parcours</Link>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -150,7 +190,19 @@ export default function ParcoursPersonnalise() {
           )}
           <div className="mt-4 flex flex-wrap gap-2">
             <button className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white">Commencer ce parcours</button>
-            <button className="rounded-xl border border-zinc-200/70 bg-white px-4 py-2 text-sm dark:border-white/10 dark:bg-zinc-900/60">Enregistrer</button>
+            <button
+              disabled={saveStatus==='saving'}
+              onClick={async ()=>{
+                if (!roadmap) return;
+                setSaveStatus('saving');
+                const res = await saveRoadmap(roadmap);
+                if ('error' in res) setSaveStatus('error'); else setSaveStatus('saved');
+                setTimeout(()=> setSaveStatus('idle'), 2500);
+              }}
+              className="inline-flex items-center gap-2 rounded-xl border border-zinc-200/70 bg-white px-4 py-2 text-sm dark:border-white/10 dark:bg-zinc-900/60 disabled:opacity-60"
+            >
+              {saveStatus==='saving' ? 'Enregistrement…' : saveStatus==='saved' ? 'Enregistré ✓' : 'Enregistrer'}
+            </button>
             <Link to="/parcours" className="rounded-xl border border-zinc-200/70 bg-white px-4 py-2 text-sm dark:border-white/10 dark:bg-zinc-900/60">Voir tous les parcours</Link>
           </div>
         </section>

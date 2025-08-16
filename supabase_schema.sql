@@ -71,3 +71,211 @@ $$;
 
 -- Autoriser l'exécution de la fonction aux rôles publics (anonymes et authentifiés)
 grant execute on function public.add_to_waitlist(text, text) to anon, authenticated;
+
+-- Active RLS + politiques sûres par défaut.
+-- Adapte les noms de tables/colonnes (user_id, email, etc.) si nécessaire.
+
+-- 0) Helper: activer RLS proprement si la table existe
+DO $$
+BEGIN
+  -- 1) profiles (id = auth.uid())
+  IF to_regclass('public.profiles') IS NOT NULL THEN
+    ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+
+    DROP POLICY IF EXISTS profiles_select_own ON public.profiles;
+    CREATE POLICY profiles_select_own ON public.profiles
+      FOR SELECT USING (auth.uid() = id);
+
+    DROP POLICY IF EXISTS profiles_insert_own ON public.profiles;
+    CREATE POLICY profiles_insert_own ON public.profiles
+      FOR INSERT WITH CHECK (auth.uid() = id);
+
+    DROP POLICY IF EXISTS profiles_update_own ON public.profiles;
+    CREATE POLICY profiles_update_own ON public.profiles
+      FOR UPDATE USING (auth.uid() = id) WITH CHECK (auth.uid() = id);
+
+    DROP POLICY IF EXISTS profiles_delete_own ON public.profiles;
+    CREATE POLICY profiles_delete_own ON public.profiles
+      FOR DELETE USING (auth.uid() = id);
+  END IF;
+
+  -- 2) progress (user_id = auth.uid())
+  IF to_regclass('public.progress') IS NOT NULL THEN
+    ALTER TABLE public.progress ENABLE ROW LEVEL SECURITY;
+
+    DROP POLICY IF EXISTS progress_select_own ON public.progress;
+    CREATE POLICY progress_select_own ON public.progress
+      FOR SELECT USING (auth.uid() = user_id);
+
+    DROP POLICY IF EXISTS progress_insert_own ON public.progress;
+    CREATE POLICY progress_insert_own ON public.progress
+      FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+    DROP POLICY IF EXISTS progress_update_own ON public.progress;
+    CREATE POLICY progress_update_own ON public.progress
+      FOR UPDATE USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+
+    -- Pas de delete public (seulement service_role)
+  END IF;
+
+  -- 3) roadmaps personnalisées (user_id = auth.uid())
+  IF to_regclass('public.roadmaps') IS NOT NULL THEN
+    ALTER TABLE public.roadmaps ENABLE ROW LEVEL SECURITY;
+
+    DROP POLICY IF EXISTS roadmaps_select_own ON public.roadmaps;
+    CREATE POLICY roadmaps_select_own ON public.roadmaps
+      FOR SELECT USING (auth.uid() = user_id);
+
+    DROP POLICY IF EXISTS roadmaps_insert_own ON public.roadmaps;
+    CREATE POLICY roadmaps_insert_own ON public.roadmaps
+      FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+    DROP POLICY IF EXISTS roadmaps_update_own ON public.roadmaps;
+    CREATE POLICY roadmaps_update_own ON public.roadmaps
+      FOR UPDATE USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+
+    -- Pas de delete public (seulement service_role)
+  END IF;
+
+  -- Table des roadmaps personnalisées (IA) — si absente, la créer
+  do $$
+  begin
+    if to_regclass('public.roadmaps') is null then
+      create table public.roadmaps (
+        id uuid primary key default gen_random_uuid(),
+        user_id uuid not null references auth.users(id) on delete cascade,
+        topic text not null check (length(topic) between 1 and 200),
+        kind text not null default 'skills' check (kind in ('skills')),
+        payload jsonb not null,
+        created_at timestamptz not null default now(),
+        updated_at timestamptz not null default now()
+      );
+
+      create index roadmaps_user_id_created_at_idx on public.roadmaps(user_id, created_at desc);
+    end if;
+  end$$;
+
+  -- Activer RLS + politiques si non déjà définies (sécurité propriétaire)
+  alter table public.roadmaps enable row level security;
+
+  do $$
+  begin
+    if not exists (
+      select 1 from pg_policies where schemaname='public' and tablename='roadmaps' and policyname='roadmaps_select_own'
+    ) then
+      create policy roadmaps_select_own on public.roadmaps for select using (auth.uid() = user_id);
+    end if;
+    if not exists (
+      select 1 from pg_policies where schemaname='public' and tablename='roadmaps' and policyname='roadmaps_insert_own'
+    ) then
+      create policy roadmaps_insert_own on public.roadmaps for insert with check (auth.uid() = user_id);
+    end if;
+    if not exists (
+      select 1 from pg_policies where schemaname='public' and tablename='roadmaps' and policyname='roadmaps_update_own'
+    ) then
+      create policy roadmaps_update_own on public.roadmaps for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
+    end if;
+  end$$;
+
+  -- 4) quiz_sessions (si vous stockez les réponses du quiz; user_id nullable => on n’autorise la lecture/écriture qu’au propriétaire)
+  IF to_regclass('public.quiz_sessions') IS NOT NULL THEN
+    ALTER TABLE public.quiz_sessions ENABLE ROW LEVEL SECURITY;
+
+    DROP POLICY IF EXISTS quiz_sessions_select_own ON public.quiz_sessions;
+    CREATE POLICY quiz_sessions_select_own ON public.quiz_sessions
+      FOR SELECT USING (user_id IS NOT NULL AND auth.uid() = user_id);
+
+    DROP POLICY IF EXISTS quiz_sessions_insert_own ON public.quiz_sessions;
+    CREATE POLICY quiz_sessions_insert_own ON public.quiz_sessions
+      FOR INSERT WITH CHECK (user_id IS NOT NULL AND auth.uid() = user_id);
+
+    DROP POLICY IF EXISTS quiz_sessions_update_own ON public.quiz_sessions;
+    CREATE POLICY quiz_sessions_update_own ON public.quiz_sessions
+      FOR UPDATE USING (user_id IS NOT NULL AND auth.uid() = user_id)
+      WITH CHECK (user_id IS NOT NULL AND auth.uid() = user_id);
+  END IF;
+
+  -- 5) waitlist (insert ouvert; lecture limitée à l’email de l’utilisateur connecté)
+  IF to_regclass('public.waitlist') IS NOT NULL THEN
+    ALTER TABLE public.waitlist ENABLE ROW LEVEL SECURITY;
+
+    -- Insert ouvert à tous (y compris anon); prévoir du throttling côté Edge Function
+    DROP POLICY IF EXISTS waitlist_insert_all ON public.waitlist;
+    CREATE POLICY waitlist_insert_all ON public.waitlist
+      FOR INSERT WITH CHECK (true);
+
+    -- Lecture uniquement par l’utilisateur dont le JWT contient le même email
+    DROP POLICY IF EXISTS waitlist_select_own_email ON public.waitlist;
+    CREATE POLICY waitlist_select_own_email ON public.waitlist
+      FOR SELECT USING (
+        (auth.jwt() ->> 'email') IS NOT NULL AND email = (auth.jwt() ->> 'email')
+      );
+
+    -- Pas d’UPDATE/DELETE (réservé au service_role)
+  END IF;
+
+  -- 6) Contenu catalogue (parcours, modules) : lecture publique, aucune écriture
+  IF to_regclass('public.parcours') IS NOT NULL THEN
+    ALTER TABLE public.parcours ENABLE ROW LEVEL SECURITY;
+    DROP POLICY IF EXISTS parcours_read_all ON public.parcours;
+    CREATE POLICY parcours_read_all ON public.parcours
+      FOR SELECT USING (true);
+    -- Pas d’INSERT/UPDATE/DELETE pour les clients (gérés via migrations / service_role)
+  END IF;
+
+  IF to_regclass('public.modules') IS NOT NULL THEN
+    ALTER TABLE public.modules ENABLE ROW LEVEL SECURITY;
+    DROP POLICY IF EXISTS modules_read_all ON public.modules;
+    CREATE POLICY modules_read_all ON public.modules
+      FOR SELECT USING (true);
+  END IF;
+
+  -- 7) Logs IA (ai_logs) : insertion par utilisateurs connectés; lecture interdite (sauf service_role)
+  IF to_regclass('public.ai_logs') IS NOT NULL THEN
+    ALTER TABLE public.ai_logs ENABLE ROW LEVEL SECURITY;
+
+    DROP POLICY IF EXISTS ai_logs_insert_auth ON public.ai_logs;
+    CREATE POLICY ai_logs_insert_auth ON public.ai_logs
+      FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
+
+    -- Pas de SELECT/UPDATE/DELETE (service_role seulement)
+  END IF;
+END$$;
+
+-- 8) Storage policies (pour buckets 'public' et 'avatars')
+-- Note: storage.objects.owner existe et peut servir pour limiter l’accès.
+
+-- Lire tout ce qui est dans le bucket 'public'
+DROP POLICY IF EXISTS storage_public_read ON storage.objects;
+CREATE POLICY storage_public_read ON storage.objects
+  FOR SELECT USING (bucket_id = 'public');
+
+-- Écrire/mettre à jour/supprimer uniquement ses propres fichiers sous le préfixe `${uid}/`
+DROP POLICY IF EXISTS storage_user_write ON storage.objects;
+CREATE POLICY storage_user_write ON storage.objects
+  FOR INSERT WITH CHECK (
+    auth.uid() = owner
+    AND bucket_id IN ('public','avatars')
+    AND name LIKE auth.uid()::text || '/%'
+  );
+
+DROP POLICY IF EXISTS storage_user_update ON storage.objects;
+CREATE POLICY storage_user_update ON storage.objects
+  FOR UPDATE USING (
+    auth.uid() = owner
+    AND bucket_id IN ('public','avatars')
+    AND name LIKE auth.uid()::text || '/%'
+  )
+  WITH CHECK (
+    auth.uid() = owner
+    AND bucket_id IN ('public','avatars')
+    AND name LIKE auth.uid()::text || '/%'
+  );
+
+DROP POLICY IF EXISTS storage_user_delete ON storage.objects;
+CREATE POLICY storage_user_delete ON storage.objects
+  FOR DELETE USING (
+    auth.uid() = owner
+    AND bucket_id IN ('public','avatars')
+    AND name LIKE auth.uid()::text || '/%'
+  );

@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
-import { CheckCircle2, Clock, Shield, ServerCog, Zap, Mail, ArrowRight, Hourglass } from 'lucide-react';
+import { CheckCircle2, Clock, Shield, ServerCog, Zap, Mail, ArrowRight, Hourglass, Sparkles } from 'lucide-react';
 import { addToWaitlist } from '../api/waitlist';
 
 type TrackStatus = 'available' | 'waitlist' | 'coming-soon';
@@ -204,6 +204,24 @@ export default function ParcoursIndex() {
           </div>
         </div>
       )}
+
+      {/* Bandeau distinct: créer son parcours perso */}
+      <section className="relative py-10">
+        <div className="mx-auto max-w-6xl px-4 md:px-6">
+          <div className="overflow-hidden rounded-3xl border border-purple-500/20 bg-gradient-to-br from-purple-500/10 via-purple-500/5 to-cyan-500/10 p-6 text-center backdrop-blur dark:border-white/10 dark:from-purple-500/10 dark:via-white/5 dark:to-cyan-500/10">
+            <div className="mx-auto mb-2 inline-flex items-center gap-2 rounded-full bg-white/60 px-3 py-1 text-xs font-semibold text-purple-700 ring-1 ring-purple-500/20 dark:bg-white/10 dark:text-white/80 dark:ring-white/15">
+              <Sparkles className="h-3.5 w-3.5" /> Nouveau
+            </div>
+            <h2 className="text-xl font-bold tracking-tight md:text-2xl">Vous ne trouvez pas exactement ce qu’il vous faut ?</h2>
+            <p className="mx-auto mt-1 max-w-2xl text-sm opacity-80">Créez votre propre parcours personnalisé avec un quiz intelligent. Une roadmap basée sur des compétences, adaptée à votre niveau.</p>
+            <div className="mt-4 flex justify-center">
+              <Link to="/parcours/personnalise" className="inline-flex items-center gap-2 rounded-xl bg-purple-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-purple-700">
+                Créer mon parcours <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Breadcrumb footer CTA */}
       <div className="pb-12 text-center text-sm opacity-70">

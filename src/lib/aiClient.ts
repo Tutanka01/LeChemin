@@ -1,4 +1,5 @@
 import type { SkillsRoadmap } from '../types/skills';
+import { supabase } from './supabase';
 
 export type QuizQuestion = {
   id: string;
@@ -13,13 +14,20 @@ export type QuizState = {
   answers: Record<string, string | string[]>;
 };
 
-function buildHeaders() {
+async function buildHeaders() {
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
   const anon = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
   if (anon) {
+    // Par défaut, envoyer anon pour CORS fonctions Supabase
     headers['Authorization'] = `Bearer ${anon}`;
     headers['apikey'] = anon;
   }
+  // Si l'utilisateur est connecté, ajouter son access_token (utile si la fonction exige AUTH)
+  try {
+    const { data } = await supabase.auth.getSession();
+    const access = data.session?.access_token;
+    if (access) headers['Authorization'] = `Bearer ${access}`;
+  } catch {}
   return headers;
 }
 
@@ -30,7 +38,7 @@ export async function startQuiz(goal: string): Promise<QuizQuestion[]> {
     try {
       const resp = await fetch(endpoint, {
         method: 'POST',
-  headers: buildHeaders(),
+        headers: await buildHeaders(),
         body: JSON.stringify({ action: 'quiz', goal: goal.trim(), answers: {} }),
       });
       if (resp.ok) {
@@ -58,7 +66,7 @@ export async function nextQuestions(state: QuizState): Promise<QuizQuestion[]> {
     try {
       const resp = await fetch(endpoint, {
         method: 'POST',
-  headers: buildHeaders(),
+        headers: await buildHeaders(),
         body: JSON.stringify({ action: 'quiz', goal: state.goal.trim(), answers: state.answers }),
       });
       if (resp.ok) {
@@ -102,7 +110,7 @@ export async function generateRoadmap(state: QuizState): Promise<SkillsRoadmap> 
     try {
       const resp = await fetch(endpoint, {
         method: 'POST',
-  headers: buildHeaders(),
+        headers: await buildHeaders(),
   body: JSON.stringify({ goal: state.goal, answers: state.answers }),
       });
       if (resp.ok) {

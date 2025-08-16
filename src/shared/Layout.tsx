@@ -101,6 +101,7 @@ export default function Layout() {
           <div className="hidden items-center gap-4 md:flex">
             <NavLink to="/" className={activeClass} end>Accueil</NavLink>
             <NavLink to="/parcours" className={activeClass}>Parcours</NavLink>
+            {user ? <NavLink to="/mes-parcours" className={activeClass}>Mes parcours</NavLink> : null}
             <a href="#contact" className="nav-link">Contact</a>
             {!user ? (
               <button
@@ -142,6 +143,7 @@ export default function Layout() {
             <div className="mt-2 rounded-2xl border border-zinc-200/70 bg-white/90 p-4 text-zinc-900 backdrop-blur-md dark:border-white/10 dark:bg-zinc-900/85 dark:text-zinc-100">
               <NavLink to="/" className="block py-2 text-base font-medium" onClick={() => setOpen(false)} end>Accueil</NavLink>
               <NavLink to="/parcours" className="block py-2 text-base font-medium" onClick={() => setOpen(false)}>Parcours</NavLink>
+              {user ? <NavLink to="/mes-parcours" className="block py-2 text-base font-medium" onClick={() => setOpen(false)}>Mes parcours</NavLink> : null}
               <a href="#contact" className="block py-2 text-base font-medium" onClick={() => setOpen(false)}>Contact</a>
               {!user ? (
                 <button onClick={() => { setOpen(false); navigate('/auth'); }} className="mt-2 w-full rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 dark:border-blue-500/30 dark:bg-blue-600/10 dark:text-blue-200 dark:hover:bg-blue-600/20">Connexion</button>
