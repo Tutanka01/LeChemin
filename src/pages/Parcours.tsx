@@ -300,6 +300,16 @@ export default function Parcours() {
     return computeModuleProgress(total, done);
   }, [progress]);
 
+  // Trouve le prochain module à continuer: premier non-complété ou dernier
+  const nextStepToContinue = useMemo(() => {
+    for (const step of devOpsPath) {
+      const mp = moduleProgress[step.id];
+      if (!mp) return devOpsPath[0];
+      if (mp.done < mp.total) return step;
+    }
+    return devOpsPath[devOpsPath.length - 1];
+  }, [moduleProgress]);
+
   // Step card mémoïsée pour éviter re-rendus lors de l'ouverture du modal
   const StepCard = React.memo(function StepCard({ step, index, isConnected }: { step: DevOpsStep; index: number; isConnected: boolean }) {
     const mp = moduleProgress[step.id];
@@ -503,10 +513,10 @@ export default function Parcours() {
         <Helmet>
           <title>Parcours DevOps complet | Roadmap pratique | LeChemin.tech</title>
           <meta name="description" content="Parcours DevOps interactif: Linux, Git, Scripting, Docker, Kubernetes, Cloud, CI/CD, Sécurité. Suivez votre progression et devenez DevOps." />
-          <link rel="canonical" href="https://lechemin.tech/parcours" />
+          <link rel="canonical" href="https://lechemin.tech/parcours/devops" />
           <meta property="og:title" content="Parcours DevOps complet" />
           <meta property="og:description" content="Roadmap DevOps interactive avec modules, ressources et suivi de progression." />
-          <meta property="og:url" content="https://lechemin.tech/parcours" />
+          <meta property="og:url" content="https://lechemin.tech/parcours/devops" />
           <script type="application/ld+json">{JSON.stringify({
             '@context': 'https://schema.org',
             '@type': 'Course',
@@ -514,12 +524,12 @@ export default function Parcours() {
             description: 'Parcours DevOps interactif en français: Linux, Git, Docker, Kubernetes, Cloud, CI/CD, Sécurité.',
             inLanguage: 'fr',
             provider: { '@type': 'Organization', name: 'LeChemin.tech', url: 'https://lechemin.tech/' },
-            hasCourseInstance: devOpsPath.map(step => ({
+              hasCourseInstance: devOpsPath.map(step => ({
               '@type': 'CourseInstance',
               name: step.title,
               description: step.description,
               courseMode: step.difficulty,
-              url: `https://lechemin.tech/parcours#${step.id}`
+              url: `https://lechemin.tech/parcours/devops#${step.id}`
             }))
           })}</script>
         </Helmet>
@@ -528,13 +538,17 @@ export default function Parcours() {
           <div className="mx-auto max-w-7xl px-4 md:px-6">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="text-center">
               <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-blue-500/10 px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-400"><Star className="h-4 w-4" />Parcours DevOps</div>
-              <h1 className="mb-6 text-4xl font-black tracking-tight md:text-6xl">Votre Chemin vers le <span className="bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">DevOps</span></h1>
-              <p className="mx-auto mb-8 max-w-2xl text-lg leading-relaxed opacity-80">Un parcours structuré et visuel pour maîtriser DevOps étape par étape. Chaque module prépare le suivant.</p>
-              <div className="mx-auto mb-2 max-w-3xl text-sm italic opacity-70">Pas de chiffres marketing artificiels — juste un chemin clair.</div>
+              <h1 className="mb-6 text-4xl font-black tracking-tight md:text-6xl">Devenez opérationnel en <span className="bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">DevOps</span></h1>
+              <p className="mx-auto mb-8 max-w-2xl text-lg leading-relaxed opacity-80">Apprenez l'essentiel, module par module: Linux, Git, Docker, Kubernetes, Cloud, CI/CD, Sécurité. Gratuit et pragmatique.</p>
+              <div className="mx-auto mb-2 max-w-3xl text-sm italic opacity-70">Zéro blabla — des étapes concrètes, des ressources fiables.</div>
               <div className="flex flex-col items-center gap-3 sm:flex-row sm:flex-wrap sm:justify-center">
                 <div className="rounded-full bg-white/10 px-5 py-3 text-sm backdrop-blur dark:bg-white/5">Construit avec passion</div>
                 <div className="rounded-full bg-white/10 px-5 py-3 text-sm backdrop-blur dark:bg-white/5">Expérience terrain</div>
                 <div className="rounded-full bg-white/10 px-5 py-3 text-sm backdrop-blur dark:bg-white/5">Ressources ouvertes</div>
+              </div>
+              <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+                <a href="/parcours" className="rounded-xl border border-zinc-200/70 bg-white px-4 py-2 text-sm font-medium backdrop-blur transition hover:bg-zinc-50 dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10">Voir tous les parcours</a>
+                <button onClick={() => setSelectedStep(nextStepToContinue)} className="rounded-xl bg-blue-600 px-5 py-2 text-sm font-semibold text-white shadow transition hover:bg-blue-700">Reprendre là où j'en suis</button>
               </div>
             </motion.div>
           </div>

@@ -5,6 +5,7 @@ import './index.css';
 import Layout from './shared/Layout.tsx';
 import Home from './pages/Home';
 import Parcours from './pages/Parcours';
+import ParcoursIndex from './pages/ParcoursIndex';
 import { AuthProvider } from './context/AuthContext';
 import AuthPage from './pages/auth/Auth';
 import AuthCallback from './pages/auth/Callback';
@@ -19,7 +20,8 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/auth" element={<AuthPage />} />
               <Route path="/auth/callback" element={<AuthCallback />} />
-              <Route path="/parcours" element={<Parcours />} />
+              <Route path="/parcours" element={<ParcoursIndex />} />
+              <Route path="/parcours/devops" element={<Parcours />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Route>
           </Routes>

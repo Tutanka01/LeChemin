@@ -127,7 +127,7 @@ export default function Home() {
             className="mt-8 flex w-full flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4"
           >
             <Link
-              to="/parcours"
+              to="/parcours/devops"
               className="group btn-shine relative inline-flex w-full items-center justify-center gap-2 overflow-hidden rounded-2xl px-6 py-3 text-sm font-semibold shadow-lg transition focus:outline-none focus:ring-2 focus:ring-[var(--accent)] sm:w-auto"
               style={{ background: `linear-gradient(180deg, var(--accent), #1746D1)`, boxShadow: `0 10px 30px ${accent}55`, color: "white" }}
             >
@@ -199,7 +199,7 @@ export default function Home() {
                     <p className="mt-1 text-xs leading-relaxed opacity-80">{desc}</p>
                   </div>
                 </div>
-                <Link to="/parcours" className="relative z-10 mt-5 inline-flex items-center gap-2 text-xs font-medium opacity-80">
+                <Link to="/parcours/devops" className="relative z-10 mt-5 inline-flex items-center gap-2 text-xs font-medium opacity-80">
                   Explorer <ChevronRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
                 </Link>
               </motion.div>
@@ -228,7 +228,7 @@ export default function Home() {
                     <p className="mt-1 text-sm opacity-80">{desc}</p>
                   </div>
                 </div>
-                <Link to="/parcours" className="relative z-10 mt-6 inline-flex items-center gap-2 text-sm font-medium opacity-80">
+                <Link to="/parcours/devops" className="relative z-10 mt-6 inline-flex items-center gap-2 text-sm font-medium opacity-80">
                   Explorer le parcours <ChevronRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
                 </Link>
               </motion.div>

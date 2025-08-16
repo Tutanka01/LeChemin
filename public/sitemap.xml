@@ -10,12 +10,17 @@
     <changefreq>weekly</changefreq>
     <priority>0.90</priority>
   </url>
+  <url>
+    <loc>https://lechemin.tech/parcours/devops</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
   <!-- Individual DevOps steps deep links -->
-  <url><loc>https://lechemin.tech/parcours#fondamentaux</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://lechemin.tech/parcours#versioning</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://lechemin.tech/parcours#scripting</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://lechemin.tech/parcours#containers</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://lechemin.tech/parcours#cloud</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://lechemin.tech/parcours#cicd</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://lechemin.tech/parcours#security</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://lechemin.tech/parcours/devops#fondamentaux</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://lechemin.tech/parcours/devops#versioning</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://lechemin.tech/parcours/devops#scripting</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://lechemin.tech/parcours/devops#containers</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://lechemin.tech/parcours/devops#cloud</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://lechemin.tech/parcours/devops#cicd</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://lechemin.tech/parcours/devops#security</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
 </urlset>
